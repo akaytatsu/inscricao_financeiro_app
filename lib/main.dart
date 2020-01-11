@@ -1,4 +1,4 @@
-import 'package:iec_despesas_app/home.dart';
+import 'package:iec_despesas_app/pages/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import './provider/user_provider.dart';
@@ -16,7 +16,7 @@ class MainPage extends StatelessWidget {
     return MultiProvider(providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),
     ], child: MaterialApp(
-        home: new TabbedHomePage(),
+        home: new MainHomePage(),
       )
     );
   }
