@@ -1,5 +1,6 @@
 import 'package:iec_despesas_app/components/solicitacao_box.dart';
 import 'package:flutter/material.dart';
+import 'package:iec_despesas_app/pages/home/components/menu.dart';
 
 class MainHomePage extends StatefulWidget {
   MainHomePage({Key key}) : super(key: key);
@@ -57,9 +58,12 @@ class _MainHomePageState extends State<MainHomePage> {
     return response;
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF2F4F8),
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -69,6 +73,19 @@ class _MainHomePageState extends State<MainHomePage> {
       body: ListView(
         children: [
           Padding(padding: EdgeInsets.only(top: 20),),
+          Container(
+            child: Center(
+              child: MainMenu(defaultSelected: 1,),
+            ),
+          ),
+          Padding(padding: EdgeInsets.only(top: 20),),
+          Container(
+            margin: EdgeInsets.only(left: 20, right: 20),
+            child: Divider(
+              color: Color(0xFF333333),
+            ),
+          ),
+          Padding(padding: EdgeInsets.only(top: 10),),
           ...solicitacoes()
         ],
       ),
