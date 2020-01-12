@@ -7,8 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RestApi {
-  String urlBase = "http://192.168.25.222:9000/";
-  // String urlBase = "https://app.englishingroup.com/";
+  // String urlBase = "http://192.168.25.222:9000/";
+  String urlBase = "http://inscricao.igrejaemcontagem.com.br/";
 
   Future<Map<String, String>> _headers({Map<String, String> headers, logged = true}) async{
     if(headers == null){
