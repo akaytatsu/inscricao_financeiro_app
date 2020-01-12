@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:iec_despesas_app/services/serializers/account_serializers.dart';
 import 'package:iec_despesas_app/services/serializers/create_account_error.dart';
+import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
 import 'package:iec_despesas_app/services/serializers/token_serializer.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -180,6 +181,21 @@ class RestApi {
     }
 
     return false;
+  }
+
+  Future<Map<String, dynamic>> getSolicitacoes() async {
+    final url = 'api/financeiro/solicitacoes';
+    final response = await this._get(url, logged: true);
+ 
+    if(response.statusCode == 200){
+      return this.responseObject(
+        response.statusCode, 
+        data: ( json.decode(response.body) as List).map((data) => SolicitacaoSerializer.fromJson(data)).toList() );
+    }else{
+      return this.responseObject(
+        response.statusCode, 
+        error: response.body );
+    }
   }
 
 

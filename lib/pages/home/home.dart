@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:iec_despesas_app/main.dart';
 import 'package:iec_despesas_app/pages/home/components/menu.dart';
 import 'package:iec_despesas_app/services/api.dart';
+import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
+import 'package:intl/intl.dart';
 
 class MainHomePage extends StatefulWidget {
   MainHomePage({Key key}) : super(key: key);
@@ -12,56 +14,25 @@ class MainHomePage extends StatefulWidget {
 }
 
 class _MainHomePageState extends State<MainHomePage> {
-  List<Widget> solicitacoes() {
-    List<Widget> response = [];
 
-    response.add(SolicitacaoBox(
-      status: 1,
-      dataSolicitacao: "21/01/2019",
-      solicitante: "Thiago Freitas",
-      valor: 200,
-    ));
+  RestApi api = RestApi();
 
-    response.add(SolicitacaoBox(
-      status: 2,
-      dataSolicitacao: "23/01/2019",
-      solicitante: "Samuel Backer",
-      valor: 70,
-    ));
+  Future<List<SolicitacaoSerializer>> buscaSolicitacoes() async{
 
-    response.add(SolicitacaoBox(
-      status: 4,
-      dataSolicitacao: "27/01/2019",
-      solicitante: "Charles Pierre Freitas",
-      valor: 6700,
-    ));
+    var response = await api.getSolicitacoes();
+    List<SolicitacaoSerializer> solicitacoes = [];
 
-    response.add(SolicitacaoBox(
-      status: 5,
-      dataSolicitacao: "27/01/2019",
-      solicitante: "Cleiton Cunha",
-      valor: 1200,
-    ));
+    if( response['status'] == 200 ){
+      solicitacoes = response['data'];
+    }
 
-    response.add(SolicitacaoBox(
-      status: 6,
-      dataSolicitacao: "27/01/2019",
-      solicitante: "Fabiane Freitas",
-      valor: 350,
-    ));
+    return solicitacoes;
 
-    response.add(SolicitacaoBox(
-      status: 8,
-      dataSolicitacao: "27/01/2019",
-      solicitante: "Thiago Freitas",
-      valor: 125,
-    ));
-
-    return response;
   }
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: Color(0xFFF2F4F8),
       appBar: AppBar(
@@ -80,25 +51,50 @@ class _MainHomePageState extends State<MainHomePage> {
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          Padding(padding: EdgeInsets.only(top: 20),),
-          Container(
-            child: Center(
-              child: MainMenu(defaultSelected: 1,),
-            ),
-          ),
-          Padding(padding: EdgeInsets.only(top: 20),),
-          Container(
-            margin: EdgeInsets.only(left: 20, right: 20),
-            child: Divider(
-              color: Color(0xFF333333),
-            ),
-          ),
-          Padding(padding: EdgeInsets.only(top: 10),),
-          ...solicitacoes()
-        ],
-      ),
+      body: FutureBuilder(
+        future: buscaSolicitacoes(),
+        builder: (BuildContext context, AsyncSnapshot<List<SolicitacaoSerializer>> snapshot){
+
+          List<Widget> solicitacoesWidgets = [];
+
+          if(snapshot.hasData){
+
+            for (SolicitacaoSerializer item in snapshot.data) {
+              solicitacoesWidgets.add(
+                SolicitacaoBox(
+                  status: item.status,
+                  dataSolicitacao: DateFormat("dd/MM/yyyy", "en_US").format(item.dataSolicitacao),
+                  solicitante: item.solicitante.name,
+                  valor: item.valor,
+                )
+              );
+            }
+
+          }
+
+          return ListView(
+            children: [
+              Padding(padding: EdgeInsets.only(top: 20),),
+              Container(
+                child: Center(
+                  child: MainMenu(defaultSelected: 1,),
+                ),
+              ),
+              Padding(padding: EdgeInsets.only(top: 20),),
+              Container(
+                margin: EdgeInsets.only(left: 20, right: 20),
+                child: Divider(
+                  color: Color(0xFF333333),
+                ),
+              ),
+              Padding(padding: EdgeInsets.only(top: 10),),
+
+              ...solicitacoesWidgets
+            ],
+          );
+
+        }
+      )
     );
   }
 }
