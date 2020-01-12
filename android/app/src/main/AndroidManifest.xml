@@ -7,7 +7,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="iec_despesas_app"
+        android:label="IEC Conferencia"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
