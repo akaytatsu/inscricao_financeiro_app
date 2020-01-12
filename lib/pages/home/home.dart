@@ -1,6 +1,8 @@
 import 'package:iec_despesas_app/components/solicitacao_box.dart';
 import 'package:flutter/material.dart';
+import 'package:iec_despesas_app/main.dart';
 import 'package:iec_despesas_app/pages/home/components/menu.dart';
+import 'package:iec_despesas_app/services/api.dart';
 
 class MainHomePage extends StatefulWidget {
   MainHomePage({Key key}) : super(key: key);
@@ -58,17 +60,25 @@ class _MainHomePageState extends State<MainHomePage> {
     return response;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF2F4F8),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         centerTitle: true,
         title: Text(
           "Finanças Conferência IEC",
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: (){
+              RestApi().logout();
+              Navigator.push(context, MaterialPageRoute(builder: (_) => IntermdiareScreen()));
+            },
+          ),
+        ],
       ),
       body: ListView(
         children: [

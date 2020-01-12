@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:iec_despesas_app/main.dart';
 import 'package:iec_despesas_app/pages/create_account/create_account_page.dart';
+import 'package:iec_despesas_app/services/api.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -12,7 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   final _email = TextEditingController();
   final _password = TextEditingController();
 
-  // RestApi _api = RestApi();
+  RestApi _api = RestApi();
 
   title() {
     final TextStyle titleStyle = TextStyle(
@@ -112,18 +114,15 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   actionLogin() async {
-    // Map<String, dynamic> response =
-        // await _api.login(_email.text, _password.text, context: context);
+    Map<String, dynamic> response =
+        await _api.login(_email.text, _password.text, context: context);
 
-    // if (response['status'] != 200) {
-    //   return this.errorAccountLoginDialog();
-    // }
+    if (response['status'] != 200) {
+      return this.errorAccountLoginDialog();
+    }
 
-    // Provider.of<UserProvider>(context, listen: false).setCurrentUser =
-    //     response['data'];
-
-    // Navigator.push(
-    //     context, MaterialPageRoute(builder: (context) => TabbedHomePage()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => IntermdiareScreen()));
   }
 
   createAccount() {

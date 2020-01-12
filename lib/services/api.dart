@@ -1,13 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:iec_despesas_app/services/serializers/account_serializers.dart';
+import 'package:iec_despesas_app/services/serializers/create_account_error.dart';
 import 'package:iec_despesas_app/services/serializers/token_serializer.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path/path.dart' as path;
 
 class RestApi {
-  String urlBase = "http://192.168.25.222:8080/";
+  String urlBase = "http://192.168.25.222:9000/";
   // String urlBase = "https://app.englishingroup.com/";
 
   Future<Map<String, String>> _headers({Map<String, String> headers, logged = true}) async{
@@ -127,13 +126,23 @@ class RestApi {
     }
   }
 
-  Future<Map<String, dynamic>> createAccount(String name, String email, String password, String passwordConfirm, {context}) async {
+  void logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+ 
+    if(await this.isLogged()){
+      prefs.remove("jwt");
+      prefs.remove("logged");
+    }
+  }
+
+  Future<Map<String, dynamic>> createAccount(String name, String email, String password, String passwordConfirm, String telefone, {context}) async {
     final url = 'api/account/create_account/';
     final response = await this._post(url, params: {
       "name": name,
       "email": email,
 	    "password": password,
 	    "password_confirm": passwordConfirm,
+	    "telefone": telefone,
     });
  
     if(response.statusCode == 200){
@@ -149,47 +158,12 @@ class RestApi {
     }else if(response.statusCode == 400){
       return this.responseObject(
         response.statusCode, 
-        error: CreateAccountErrorsSerializer.fromJson(json.decode(response.body)));
+        error: CreateAccountErrorSerializer.fromJson(json.decode(response.body)));
     }else{
       return this.responseObject(
         response.statusCode, 
         error: json.decode(response.body) );
     }
-  }
-
-  Future<Map<String, dynamic>> uploadImagePerfil(File image, context) async {
-    final url = this.urlBase + 'api/account_image/';
-
-    String name = path.basename(image.path);
-
-    var request = http.MultipartRequest("POST", Uri.parse(url));
-
-    request.files.add(new http.MultipartFile.fromBytes(
-    'image',
-    await image.readAsBytes(),
-    filename: name));
-    
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    if(prefs.getBool('logged') == true){
-      request.headers['Authorization'] = 'JWT ' + prefs.getString('jwt');
-    }
-
-    var response = await request.send();
- 
-    return this.responseObject(
-      response.statusCode
-    );
-  }
-
-  Future<bool> logout() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    prefs.remove("jwt");
-    prefs.remove("logged");
-
-    return true;
-
   }
 
   Future<bool> isLogged() async {

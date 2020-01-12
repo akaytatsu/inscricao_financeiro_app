@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:iec_despesas_app/pages/home/home.dart';
 import 'package:iec_despesas_app/pages/login/login_page.dart';
+import 'package:iec_despesas_app/services/api.dart';
+import 'package:iec_despesas_app/services/serializers/create_account_error.dart';
 
 class CreateAccountPage extends StatefulWidget {
   CreateAccountPage({Key key}) : super(key: key);
@@ -21,7 +24,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   final _passwordError = TextEditingController();
   final _confirmPasswordError = TextEditingController();
 
-  // RestApi _api = RestApi();
+  RestApi _api = RestApi();
 
   title() {
     final TextStyle titleStyle = TextStyle(
@@ -137,41 +140,44 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   actionNewAccount() async {
     
-    // Map<String, dynamic> response = await _api.createAccount(
-    //     _name.text, _email.text, _password.text, _confirmPassword.text,
-    //     context: context);
+    Map<String, dynamic> response = await _api.createAccount(
+        _name.text, _email.text, _password.text, _confirmPassword.text, _telefone.text, context: context);
 
     cleanFieldsErrors();
 
-    // if (response['status'] == 400) {
-    //   CreateAccountErrorsSerializer errors = response['error'];
-    //   setState(() {
+    if (response['status'] == 400) {
+      CreateAccountErrorSerializer errors = response['error'];
+      setState(() {
         
-    //     if (errors.name != null) 
-    //       if (errors.name.length > 0)
-    //         _nameError.text = errors.name[0];
+        if (errors.name != null) 
+          if (errors.name.length > 0)
+            _nameError.text = errors.name[0];
 
-    //     if (errors.email != null) 
-    //       if (errors.email.length > 0)
-    //         _emailError.text = errors.email[0];
+        if (errors.email != null) 
+          if (errors.email.length > 0)
+            _emailError.text = errors.email[0];
 
-    //     if (errors.password != null) 
-    //       if (errors.password.length > 0)
-    //         _passwordError.text = errors.password[0];
+        if (errors.password != null) 
+          if (errors.password.length > 0)
+            _passwordError.text = errors.password[0];
 
-    //     if (errors.passwordConfirm != null) 
-    //       if (errors.passwordConfirm.length > 0) 
-    //         _confirmPasswordError.text = errors.passwordConfirm[0];
+        if (errors.passwordConfirm != null) 
+          if (errors.passwordConfirm.length > 0) 
+            _confirmPasswordError.text = errors.passwordConfirm[0];
 
-    //     if (errors.nonFieldErrors != null) 
-    //       if (errors.nonFieldErrors.length > 0) 
-    //         _passwordError.text = errors.nonFieldErrors[0];
+        if (errors.telefone != null) 
+          if (errors.telefone.length > 0) 
+            _telefoneError.text = errors.telefone[0];
 
-    //   });
-    // } else if(response['status'] == 200){
-    //   Navigator.push(
-    //       context, MaterialPageRoute(builder: (context) => TabbedHomePage()));  
-    // }
+        if (errors.nonFieldErrors != null) 
+          if (errors.nonFieldErrors.length > 0) 
+            _passwordError.text = errors.nonFieldErrors[0];
+
+      });
+    } else if(response['status'] == 200){
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => MainHomePage()));  
+    }
 
   }
 
