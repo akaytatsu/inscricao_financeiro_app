@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "929294025511",
+    "firebase_url": "https://iec-conferencia.firebaseio.com",
+    "project_id": "iec-conferencia",
+    "storage_bucket": "iec-conferencia.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:929294025511:android:7db141a6f32e6c80b29f02",
+        "android_client_info": {
+          "package_name": "com.igrejaemcontagem.inscricao_financas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "929294025511-nd716h98gl38gkc5vr3qahubiee9p7nf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxxKCmTBV0mBTj3O6-b_9G6ajZC7-fOTs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "929294025511-nd716h98gl38gkc5vr3qahubiee9p7nf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
