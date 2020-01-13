@@ -224,7 +224,7 @@ class RestApi {
 
   Future<Map<String, dynamic>> newSolicitation(String description, double price, int idConferencia, {context}) async {
 
-    final url = 'api/financeiro/nova_solicitacao';
+    final url = 'api/financeiro/nova_solicitacao/';
     final response = await this._post(url, params: {
       "conferencia": idConferencia,
       "valor": price,
@@ -234,7 +234,7 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
           response.statusCode,
-          data: SolicitacaoSerializer.fromJson(response.body) );
+          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
     }else{
       return this.responseObject(
           response.statusCode,
@@ -242,15 +242,57 @@ class RestApi {
     }
   }
 
-  Future<bool> approve(int solicitationId, {context}) async {
-    final url = 'api/token/auth';
+  Future<Map<String, dynamic>> approve(int solicitationId, {context}) async {
+    final url = 'api/financeiro/aprova_solicitacao/';
     final response = await this._put(url, params: {
       "pk": solicitationId
     });
 
-    print(response.body);
+    if(response.statusCode == 200){
+      return this.responseObject(
+          response.statusCode,
+          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+    }else{
+      return this.responseObject(
+          response.statusCode,
+          error: response.body );
+    }
 
-    return response.statusCode == 200;
+  }
+
+  Future<Map<String, dynamic>> confirmTransferMoney(int solicitationId, {context}) async {
+    final url = 'api/financeiro/confirma_repasse_solicitacao/';
+    final response = await this._put(url, params: {
+      "pk": solicitationId
+    });
+
+    if(response.statusCode == 200){
+      return this.responseObject(
+          response.statusCode,
+          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+    }else{
+      return this.responseObject(
+          response.statusCode,
+          error: response.body );
+    }
+
+  }
+
+  Future<Map<String, dynamic>> confirmProof(int solicitationId, {context}) async {
+    final url = 'api/financeiro/confirma_aprovacao_solicitacao/';
+    final response = await this._put(url, params: {
+      "pk": solicitationId
+    });
+
+    if(response.statusCode == 200){
+      return this.responseObject(
+          response.statusCode,
+          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+    }else{
+      return this.responseObject(
+          response.statusCode,
+          error: response.body );
+    }
 
   }
 

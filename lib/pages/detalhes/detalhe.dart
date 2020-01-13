@@ -10,8 +10,6 @@ class DetalhePage extends StatefulWidget {
   final String title;
   final Color color;
 
-  RestApi _api = RestApi();
-
   DetalhePage({Key key, @required this.item, @required this.title, @required this.color})
       : super(key: key);
 
@@ -45,15 +43,15 @@ class _DetalhePageState extends State<DetalhePage> {
   configButtons(){
     if (item.status == 1 && user.canAprove) {
       buttons.add(btn("Aprovar Solicitação", Icons.check, approve));
-      buttons.add(btn("Reprovar Solicitação", Icons.close, approve));
+      buttons.add(btn("Reprovar Solicitação", Icons.close, errorRequestDialog));
     } else if (item.status == 2 && user.canPay) {
-      buttons.add(btn("Confirmar Repasse Recurso", Icons.monetization_on, approve));
+      buttons.add(btn("Confirmar Repasse Recurso", Icons.monetization_on, confirmTransferMoney));
     } else if (item.status == 3 || item.status == 4) {
-      buttons.add(btn("Selecionar Comprovante", Icons.add_a_photo, approve));
-      buttons.add(btn("Enviar Comprovante", Icons.file_upload, approve));
+      buttons.add(btn("Selecionar Comprovante", Icons.add_a_photo, errorRequestDialog));
+      buttons.add(btn("Enviar Comprovante", Icons.file_upload, errorRequestDialog));
     } else if (item.status == 5 && user.canAprove) {
-      buttons.add(btn("Confirmar Comprovação", Icons.check_circle, approve));
-      buttons.add(btn("Recusar Comprovação", Icons.reply, approve));
+      buttons.add(btn("Confirmar Comprovação", Icons.check_circle, confirmProof));
+      buttons.add(btn("Recusar Comprovação", Icons.reply, errorRequestDialog));
     }
   }
 
@@ -200,15 +198,59 @@ class _DetalhePageState extends State<DetalhePage> {
         ));
   }
 
+  errorRequestDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            // title: Text("ops..."),
+              content: Text(
+                "Houve uma falha ao processar sua ação, por favor tente novamente.",
+                textAlign: TextAlign.center,
+              ),
+              actions: <Widget>[
+                // define os botões na base do dialogo
+                FlatButton(
+                  child: Text("close"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ]);
+        });
+  }
+
   approve() async{
-    bool response = await _api.approve(item.id);
+    Map<String, dynamic> response = await _api.approve(item.id);
 
-    print(response);
-
-    if(response) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MainHomePage()));
+    if (response['status'] != 200) {
+      return this.errorRequestDialog();
     }
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MainHomePage()));
+  }
+
+  confirmTransferMoney() async{
+    Map<String, dynamic> response = await _api.confirmTransferMoney(item.id);
+
+    if (response['status'] != 200) {
+      return this.errorRequestDialog();
+    }
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MainHomePage()));
+  }
+
+  confirmProof() async{
+    Map<String, dynamic> response = await _api.confirmProof(item.id);
+
+    if (response['status'] != 200) {
+      return this.errorRequestDialog();
+    }
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MainHomePage()));
   }
 
   Widget btn(String label, IconData icon, Function action){

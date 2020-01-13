@@ -70,7 +70,7 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
 
   actionRegister() async {
     Map<String, dynamic> response =
-    await _api.newSolicitation(_description.text, double.parse(_price.text), 1, context: context);
+    await _api.newSolicitation(_description.text, double.parse(_price.text), _currentConferencia.id, context: context);
 
     if (response['status'] != 200) {
       return this.errorRegisterSolicitationDialog();
@@ -129,13 +129,13 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
         });
   }
 
-  void changedDropDownItem(ConferenciaSerializer selectedCity) {
+  void changedDropDownItem(ConferenciaSerializer selectedConferencia) {
     if(_dropDownConferencia.isEmpty || _dropDownConferencia.length == 1){
       return;
     }
 
     setState(() {
-      _currentConferencia = selectedCity;
+      _currentConferencia = selectedConferencia;
     });
   }
 
@@ -186,7 +186,7 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
                         );
                       }
 
-                      return null;
+                      return new DropdownButton(items: [], onChanged: null);
 
                     }
                 ),
