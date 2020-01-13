@@ -1,4 +1,4 @@
-package com.example.iec_despesas_app
+package com.igrejaemcontagem.inscricao_financas
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
