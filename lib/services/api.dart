@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RestApi {
-  // String urlBase = "http://192.168.25.222:9000/";
   String urlBase = "http://inscricao.igrejaemcontagem.com.br/";
 
   Future<Map<String, String>> _headers({Map<String, String> headers, logged = true}) async{
@@ -252,6 +251,31 @@ class RestApi {
       return this.responseObject(
           response.statusCode,
           data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+    }else{
+      return this.responseObject(
+          response.statusCode,
+          error: response.body );
+    }
+  }
+
+  Future<Map<String, dynamic>> updateOneSignalID(String oneSignalId) async {
+    final url = 'api/account/update_onesignal_id/';
+
+    if(! await this.isLogged()){
+      return this.responseObject(
+        400,
+        error: {"error": "usuario não esta logado"}
+      ); 
+    }
+
+    final response = await this._put(url, params: {
+      "one_signal_id": oneSignalId
+    });
+
+    if(response.statusCode == 200){
+      return this.responseObject(
+          response.statusCode,
+          data: "");
     }else{
       return this.responseObject(
           response.statusCode,

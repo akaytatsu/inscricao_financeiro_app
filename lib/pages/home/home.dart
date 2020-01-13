@@ -4,7 +4,7 @@ import 'package:iec_despesas_app/main.dart';
 import 'package:iec_despesas_app/pages/home/components/menu.dart';
 import 'package:iec_despesas_app/services/api.dart';
 import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
-import 'package:intl/intl.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class MainHomePage extends StatefulWidget {
   MainHomePage({Key key}) : super(key: key);
@@ -28,6 +28,59 @@ class _MainHomePageState extends State<MainHomePage> {
 
     return solicitacoes;
 
+  }
+
+  void _handleNotificationReceived(OSNotificationOpenedResult result) {
+
+    int requestId;
+
+    try {
+      requestId = result.notification.payload.additionalData['id'];
+    } catch (e) {
+      return;
+    }
+
+    // Samuel a notificação é aqui
+    // Navigator.push(context, MaterialPageRoute(builder: (_) => DetalhePage()))
+  }
+
+  void initOneSignal() async{
+    
+    OneSignal.shared.init(
+      "804ea63b-9ec2-4fe8-b65a-e4742b583777",
+      iOSSettings: {
+        OSiOSSettings.autoPrompt: true,
+        OSiOSSettings.inAppLaunchUrl: true
+      }
+    );
+    OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
+    OneSignal.shared.setNotificationOpenedHandler(_handleNotificationReceived);
+
+    this.updateUserId();
+  }
+
+  updateUserId() async{
+    RestApi api = RestApi();
+
+    String oneSignalID = await this.getToken();
+
+    await api.updateOneSignalID(oneSignalID);
+  }
+
+  Future<String> getToken() async{
+    var status = await OneSignal.shared.getPermissionSubscriptionState();
+
+    if (status.subscriptionStatus.subscribed){
+      return status.subscriptionStatus.userId;
+    }
+
+    return "";
+  }
+
+  @override
+  void initState() { 
+    super.initState();
+    this.initOneSignal();
   }
 
   @override
