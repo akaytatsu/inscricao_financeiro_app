@@ -4,6 +4,7 @@ class AccountSerializer {
     String email;
     bool canAprove;
     bool canRequest;
+    bool canPay;
 
     AccountSerializer({
         this.id,
@@ -11,6 +12,7 @@ class AccountSerializer {
         this.email,
         this.canAprove,
         this.canRequest,
+        this.canPay,
     });
 
     factory AccountSerializer.fromJson(Map<String, dynamic> json) => AccountSerializer(
@@ -19,6 +21,7 @@ class AccountSerializer {
         email: json["email"],
         canAprove: json["can_aprove"],
         canRequest: json["can_request"],
+        canPay: json["can_pay"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -27,6 +30,7 @@ class AccountSerializer {
         "email": email,
         "can_aprove": canAprove,
         "can_request": canRequest,
+        "can_pay": canPay,
     };
 }
 

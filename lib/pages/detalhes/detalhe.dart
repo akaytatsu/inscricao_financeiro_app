@@ -1,40 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:iec_despesas_app/pages/home/home.dart';
+import 'package:iec_despesas_app/services/api.dart';
+import 'package:iec_despesas_app/services/serializers/account_serializers.dart';
+import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
+import 'package:intl/intl.dart';
 
 class DetalhePage extends StatefulWidget {
-  final int status;
-  final int id;
+  final SolicitacaoSerializer item;
+  final String title;
+  final Color color;
 
-  DetalhePage({Key key, @required this.status, @required this.id})
+  RestApi _api = RestApi();
+
+  DetalhePage({Key key, @required this.item, @required this.title, @required this.color})
       : super(key: key);
 
   @override
   _DetalhePageState createState() =>
-      _DetalhePageState(status: this.status, id: this.id);
+      _DetalhePageState(item: this.item, title: this.title, color: this.color);
 }
 
 class _DetalhePageState extends State<DetalhePage> {
-  final int status;
-  final int id;
+  final SolicitacaoSerializer item;
+  final String title;
+  final Color color;
 
-  Color colorStatus() {
-    if (status == 1) {
-      return Color(0xFF857E7E);
-    } else if (status == 2) {
-      return Color(0xFF3977FF);
-    } else if (status == 3 || status == 4) {
-      return Color(0xFFB48508);
-    } else if (status == 5) {
-      return Color(0xFF7008B4);
-    } else if (status == 6) {
-      return Color(0xFF02A212);
-    } else if (status == 8) {
-      return Color(0xFFDB0404);
+  final List<Widget> buttons = new List();
+  AccountSerializer user = new AccountSerializer();
+  
+  RestApi _api = RestApi();
+  
+  _DetalhePageState({this.item, this.title, this.color});
+
+  Future<AccountSerializer> getUserInfo() async{
+    var response = await _api.me();
+
+    if( response['status'] == 200 ){
+      user = response['data'];
     }
 
-    return Color(0xFF857E7E);
+    return user;
   }
 
-  _DetalhePageState({this.status, this.id});
+  configButtons(){
+    if (item.status == 1 && user.canAprove) {
+      buttons.add(btn("Aprovar Solicitação", Icons.check, approve));
+      buttons.add(btn("Reprovar Solicitação", Icons.close, approve));
+    } else if (item.status == 2 && user.canPay) {
+      buttons.add(btn("Confirmar Repasse Recurso", Icons.monetization_on, approve));
+    } else if (item.status == 3 || item.status == 4) {
+      buttons.add(btn("Selecionar Comprovante", Icons.add_a_photo, approve));
+      buttons.add(btn("Enviar Comprovante", Icons.file_upload, approve));
+    } else if (item.status == 5 && user.canAprove) {
+      buttons.add(btn("Confirmar Comprovação", Icons.check_circle, approve));
+      buttons.add(btn("Recusar Comprovação", Icons.reply, approve));
+    }
+  }
 
   Widget detalhesTitulo() {
     return Container(
@@ -62,11 +83,11 @@ class _DetalhePageState extends State<DetalhePage> {
             ]),
         margin: EdgeInsets.only(left: 10, right: 10, top: 90),
         child: Center(
-          child: Text("Aguardando Aprovação",
+          child: Text(this.title,
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: colorStatus())),
+                  color: this.color)),
         ),
       ),
     );
@@ -93,7 +114,7 @@ class _DetalhePageState extends State<DetalhePage> {
       children: <Widget>[
         Container(
           decoration: BoxDecoration(
-            color: colorStatus(),
+            color: this.color,
           ),
           height: 137,
           width: MediaQuery.of(context).size.width,
@@ -106,6 +127,11 @@ class _DetalhePageState extends State<DetalhePage> {
   }
 
   Widget detalheELabel(String label, String valor) {
+
+    if(valor == null) {
+      valor = "";
+    }
+
     final double fontSize = 15;
 
     return Container(
@@ -162,12 +188,11 @@ class _DetalhePageState extends State<DetalhePage> {
             Padding(
               padding: EdgeInsets.only(top: 15),
             ),
-            detalheELabel("Solicitante", "Thiago Freitas"),
-            detalheELabel("Data Solicitação", "21/10/2020"),
-            detalheELabel("Valor", "R\$ 500,00"),
-            detalheELabel("Categoria", "T.I"),
-            detalheELabel("Justificativa",
-                "Solicito para fazer alguma coisa, e devo descrever aqui qual é a solticiação para um novo teste de um novo tetse para ver qual"),
+            detalheELabel("Solicitante", this.item.solicitante.name),
+            detalheELabel("Data Solicitação", DateFormat("dd/MM/yyyy", "en_US").format(this.item.dataSolicitacao)),
+            detalheELabel("Valor", "R\$" + new NumberFormat("#,###.00").format(item.valor)),
+            detalheELabel("Categoria", item.categoria),
+            detalheELabel("Justificativa", item.justificativa),
             Padding(
               padding: EdgeInsets.only(bottom: 25),
             )
@@ -175,34 +200,65 @@ class _DetalhePageState extends State<DetalhePage> {
         ));
   }
 
-  Widget btn(String label, IconData icon){
-    return Container(
-      height: 70,
-      decoration: BoxDecoration(
-        // border: Border.all(color: Color(0xFF48A8E7)),
-          borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 3,
-              offset: Offset(1, 1),
-            )
-          ]),
-      margin: EdgeInsets.only(left: 10, right: 10, top: 20),
-      child: Center(
-        child: Container(
-          margin: EdgeInsets.only(left: 20, right: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(label, style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF9FA6BC))),
-              Icon(icon, color: Color(0xFFA2A9BD), size: 30,),
-            ],
+  approve() async{
+    bool response = await _api.approve(item.id);
+
+    print(response);
+
+    if(response) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => MainHomePage()));
+    }
+  }
+
+  Widget btn(String label, IconData icon, Function action){
+    return GestureDetector(
+      onTap: action,
+      child: Container(
+        height: 70,
+        decoration: BoxDecoration(
+          // border: Border.all(color: Color(0xFF48A8E7)),
+            borderRadius: BorderRadiusDirectional.all(Radius.circular(10)),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 3,
+                offset: Offset(1, 1),
+              )
+            ]),
+        margin: EdgeInsets.only(left: 10, right: 10, top: 20),
+        child: Center(
+          child: Container(
+            margin: EdgeInsets.only(left: 20, right: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(label, style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF9FA6BC))),
+                Icon(icon, color: Color(0xFFA2A9BD), size: 30,),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> buildChildren() {
+    var builder = <Widget>[
+      topo(),
+      Padding(
+        padding: EdgeInsets.only(top: 20),
+      ),
+      detalhes(),
+
+      Padding(padding: EdgeInsets.only(top: 30))
+    ];
+
+    configButtons();
+    buttons.forEach((b) => builder.add(b));
+
+    return builder;
   }
 
   @override
@@ -210,25 +266,21 @@ class _DetalhePageState extends State<DetalhePage> {
     return Scaffold(
       backgroundColor: Color(0xFFF2F4F8),
       appBar: null,
-      body: ListView(
-        children: <Widget>[
-          topo(),
-          Padding(
-            padding: EdgeInsets.only(top: 20),
-          ),
-          detalhes(),
-          
-          Padding(padding: EdgeInsets.only(top: 30)),
+      body: FutureBuilder(
+        future: getUserInfo(),
+        builder: (BuildContext context, AsyncSnapshot<AccountSerializer> snapshot) {
 
-          btn("Aprovar Solicitação", Icons.check),
-          btn("Reprovar Solicitação", Icons.close),
-          btn("Confirmar Repasse Recurso", Icons.monetization_on),
-          btn("Selecionar Comprovante", Icons.add_a_photo),
-          btn("Enviar Comprovante", Icons.file_upload),
-          btn("Confirmar Comprovação", Icons.check_circle),
-          btn("Recusar Comprovação", Icons.reply),
-        ],
+          if(!snapshot.hasData){
+            return ListView();
+          }
+
+          return ListView(
+              children: buildChildren()
+          );
+        },
       ),
+
+      
     );
   }
 }

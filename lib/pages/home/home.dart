@@ -62,10 +62,7 @@ class _MainHomePageState extends State<MainHomePage> {
             for (SolicitacaoSerializer item in snapshot.data) {
               solicitacoesWidgets.add(
                 SolicitacaoBox(
-                  status: item.status,
-                  dataSolicitacao: DateFormat("dd/MM/yyyy", "en_US").format(item.dataSolicitacao),
-                  solicitante: item.solicitante.name,
-                  valor: item.valor,
+                  item: item,
                 )
               );
             }

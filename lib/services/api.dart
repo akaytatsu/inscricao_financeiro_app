@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:iec_despesas_app/services/serializers/account_serializers.dart';
+import 'package:iec_despesas_app/services/serializers/conferencia_serializer.dart';
 import 'package:iec_despesas_app/services/serializers/create_account_error.dart';
 import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
 import 'package:iec_despesas_app/services/serializers/token_serializer.dart';
@@ -36,6 +37,14 @@ class RestApi {
     headers = await _headers(headers: headers, logged: logged);
 
     return http.post(url, body: json.encode(params), headers: headers);
+  }
+
+  _put(String url, {Map params, Map<String, String> headers, bool logged = true}) async {
+    url = this.urlBase + url;
+
+    headers = await _headers(headers: headers, logged: logged);
+
+    return http.put(url, body: json.encode(params), headers: headers);
   }
 
   _get(String url, {Map<String, String> headers, bool logged = true}) async {
@@ -196,6 +205,53 @@ class RestApi {
         response.statusCode, 
         error: response.body );
     }
+  }
+
+  Future<Map<String, dynamic>> getConferencias() async {
+    final url = 'api/inscricao/conferencias';
+    final response = await this._get(url, logged: true);
+
+    if(response.statusCode == 200){
+      return this.responseObject(
+          response.statusCode,
+          data: ( json.decode(response.body) as List).map((data) => ConferenciaSerializer.fromJson(data)).toList() );
+    }else{
+      return this.responseObject(
+          response.statusCode,
+          error: response.body );
+    }
+  }
+
+  Future<Map<String, dynamic>> newSolicitation(String description, double price, int idConferencia, {context}) async {
+
+    final url = 'api/financeiro/nova_solicitacao';
+    final response = await this._post(url, params: {
+      "conferencia": idConferencia,
+      "valor": price,
+      "justificativa": description
+    });
+
+    if(response.statusCode == 200){
+      return this.responseObject(
+          response.statusCode,
+          data: SolicitacaoSerializer.fromJson(response.body) );
+    }else{
+      return this.responseObject(
+          response.statusCode,
+          error: response.body );
+    }
+  }
+
+  Future<bool> approve(int solicitationId, {context}) async {
+    final url = 'api/token/auth';
+    final response = await this._put(url, params: {
+      "pk": solicitationId
+    });
+
+    print(response.body);
+
+    return response.statusCode == 200;
+
   }
 
 

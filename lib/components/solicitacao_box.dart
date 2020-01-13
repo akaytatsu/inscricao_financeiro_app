@@ -1,54 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:iec_despesas_app/pages/detalhes/detalhe.dart';
+import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
 import 'package:intl/intl.dart';
 
 class SolicitacaoBox extends StatelessWidget {
-  final int status;
-  final String solicitante;
-  final String dataSolicitacao;
-  final num valor;
+  final SolicitacaoSerializer item;
+  String title;
+  Color color;
 
-  const SolicitacaoBox(
-      {Key key,
-      @required this.status,
-      @required this.solicitante,
-      @required this.dataSolicitacao,
-      @required this.valor})
+  SolicitacaoBox(
+      {Key key, @required this.item})
       : super(key: key);
 
   gradientBackground() {
     List<Color> colors;
 
-    if (status == 1) {
+    if (item.status == 1) {
       colors = [
         Color(0xFF857E7E),
         Color(0xFF656161),
       ];
-    } else if (status == 2) {
+      this.color = Color(0xFF857E7E);
+    } else if (item.status == 2) {
       colors = [
         Color(0xFF3977FF),
         Color(0xFF1C55D4),
       ];
-    } else if (status == 3 || status == 4) {
+      this.color = Color(0xFF3977FF);
+    } else if (item.status == 3 || item.status == 4) {
       colors = [
         Color(0xFFB48508),
         Color(0xFFA77A03),
       ];
-    } else if (status == 5) {
+      this.color = Color(0xFFB48508);
+    } else if (item.status == 5) {
       colors = [
         Color(0xFF7008B4),
         Color(0xFF450171),
       ];
-    } else if (status == 6) {
+      this.color = Color(0xFF7008B4);
+    } else if (item.status == 6) {
       colors = [
         Color(0xFF02A212),
         Color(0xFF008D0E),
       ];
-    } else if (status == 8) {
+      this.color = Color(0xFF02A212);
+    } else if (item.status == 8) {
       colors = [
         Color(0xFFDB0404),
         Color(0xFFB50404),
       ];
+      this.color = Color(0xFFDB0404);
     }
 
     return LinearGradient(colors: colors);
@@ -58,7 +60,7 @@ class SolicitacaoBox extends StatelessWidget {
     var textStyle = TextStyle(color: Colors.white, fontSize: 20);
 
     return Text(
-      solicitante,
+      item.solicitante.name,
       style: textStyle,
     );
   }
@@ -67,7 +69,7 @@ class SolicitacaoBox extends StatelessWidget {
     var textStyle = TextStyle(color: Colors.white, fontSize: 20);
 
     return Text(
-      dataSolicitacao,
+      DateFormat("dd/MM/yyyy", "en_US").format(item.dataSolicitacao),
       style: textStyle,
     );
   }
@@ -91,7 +93,7 @@ class SolicitacaoBox extends StatelessWidget {
           padding: EdgeInsets.only(right: 5),
         ),
         Text(
-          f.format(valor),
+          f.format(item.valor),
           style: valueTextStyle,
         ),
       ],
@@ -101,7 +103,7 @@ class SolicitacaoBox extends StatelessWidget {
   Widget statusSolicitacaoWidget() {
     String statusStr = "";
 
-    switch (this.status) {
+    switch (item.status) {
       case 1:
         statusStr = "Aguardando Aprovação";
         break;
@@ -127,6 +129,8 @@ class SolicitacaoBox extends StatelessWidget {
         statusStr = "";
     }
 
+    this.title = statusStr;
+
     statusStr = "Situação: " + statusStr;
 
     var textStyle = TextStyle(color: Color(0xFFCECBCB), fontSize: 15);
@@ -141,7 +145,7 @@ class SolicitacaoBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (_) => DetalhePage(status: status, id: 1)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => DetalhePage(item: this.item, title: this.title, color: this.color)));
       },
       child: Container(
         margin: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 10),
