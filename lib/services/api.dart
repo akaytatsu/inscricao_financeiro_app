@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:iec_despesas_app/services/serializers/account_serializers.dart';
 import 'package:iec_despesas_app/services/serializers/conferencia_serializer.dart';
 import 'package:iec_despesas_app/services/serializers/create_account_error.dart';
@@ -6,6 +7,7 @@ import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dar
 import 'package:iec_despesas_app/services/serializers/token_serializer.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart' as path;
 
 class RestApi {
   String urlBase = "http://192.168.25.221:9000/";
@@ -222,6 +224,31 @@ class RestApi {
     }
   }
 
+  Future<Map<String, dynamic>> uploadComprovante(File image, int id) async {
+    final url = this.urlBase + 'api/financeiro/enviar_comprovante/';
+
+    String name = path.basename(image.path);
+
+    var request = http.MultipartRequest("POST", Uri.parse(url));
+
+    request.files.add(new http.MultipartFile.fromBytes(
+    'image',
+    await image.readAsBytes(),
+    filename: name));
+
+    request.fields['id'] = id.toString();
+    
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    request.headers['Authorization'] = 'JWT ' + prefs.getString('jwt');
+
+    var response = await request.send();
+ 
+    return this.responseObject(
+      response.statusCode
+    );
+  }
+
   Future<Map<String, dynamic>> getConferencias() async {
     final url = 'api/inscricao/conferencias';
     final response = await this._get(url, logged: true);
@@ -259,6 +286,23 @@ class RestApi {
 
   Future<Map<String, dynamic>> approve(int solicitationId, {context}) async {
     final url = 'api/financeiro/aprova_solicitacao/';
+    final response = await this._put(url, params: {
+      "pk": solicitationId
+    });
+
+    if(response.statusCode == 200){
+      return this.responseObject(
+          response.statusCode,
+          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+    }else{
+      return this.responseObject(
+          response.statusCode,
+          error: response.body );
+    }
+  }
+
+  Future<Map<String, dynamic>> reprove(int solicitationId, {context}) async {
+    final url = 'api/financeiro/reprova_solicitacao/';
     final response = await this._put(url, params: {
       "pk": solicitationId
     });
@@ -320,6 +364,24 @@ class RestApi {
 
   Future<Map<String, dynamic>> confirmProof(int solicitationId, {context}) async {
     final url = 'api/financeiro/confirma_aprovacao_solicitacao/';
+    final response = await this._put(url, params: {
+      "pk": solicitationId
+    });
+
+    if(response.statusCode == 200){
+      return this.responseObject(
+          response.statusCode,
+          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+    }else{
+      return this.responseObject(
+          response.statusCode,
+          error: response.body );
+    }
+
+  }
+
+  Future<Map<String, dynamic>> reproveProof(int solicitationId, {context}) async {
+    final url = 'api/financeiro/reprova_aprovacao_solicitacao/';
     final response = await this._put(url, params: {
       "pk": solicitationId
     });

@@ -3,6 +3,7 @@ import 'package:iec_despesas_app/pages/home/home.dart';
 import 'package:iec_despesas_app/services/api.dart';
 import 'package:iec_despesas_app/services/serializers/account_serializers.dart';
 import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class DetalhePage extends StatefulWidget {
@@ -52,15 +53,15 @@ class _DetalhePageState extends State<DetalhePage> {
   configButtons(){
     if (item.status == 1 && user.canAprove) {
       buttons.add(btn("Aprovar Solicitação", Icons.check, approve));
-      buttons.add(btn("Reprovar Solicitação", Icons.close, errorRequestDialog));
+      buttons.add(btn("Reprovar Solicitação", Icons.close, reprove));
     } else if (item.status == 2 && user.canPay) {
       buttons.add(btn("Confirmar Repasse Recurso", Icons.monetization_on, confirmTransferMoney));
     } else if (item.status == 3 || item.status == 4) {
-      buttons.add(btn("Selecionar Comprovante", Icons.add_a_photo, errorRequestDialog));
-      buttons.add(btn("Enviar Comprovante", Icons.file_upload, errorRequestDialog));
+      buttons.add(btn("Selecionar Comprovante", Icons.add_a_photo, selecionaComprovantes));
+      // buttons.add(btn("Enviar Comprovante", Icons.file_upload, errorRequestDialog));
     } else if (item.status == 5 && user.canAprove) {
       buttons.add(btn("Confirmar Comprovação", Icons.check_circle, confirmProof));
-      buttons.add(btn("Recusar Comprovação", Icons.reply, errorRequestDialog));
+      buttons.add(btn("Recusar Comprovação", Icons.reply, reproveProof));
     }
   }
 
@@ -240,6 +241,27 @@ class _DetalhePageState extends State<DetalhePage> {
         context, MaterialPageRoute(builder: (context) => MainHomePage()));
   }
 
+  reprove() async{
+    Map<String, dynamic> response = await _api.reprove(item.id);
+
+    if (response['status'] != 200) {
+      return this.errorRequestDialog();
+    }
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MainHomePage()));
+  }
+
+  selecionaComprovantes() async{
+
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    Map<String, dynamic> response = await _api.uploadComprovante(image, item.id);
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MainHomePage()));
+  }
+
   confirmTransferMoney() async{
     Map<String, dynamic> response = await _api.confirmTransferMoney(item.id);
 
@@ -253,6 +275,17 @@ class _DetalhePageState extends State<DetalhePage> {
 
   confirmProof() async{
     Map<String, dynamic> response = await _api.confirmProof(item.id);
+
+    if (response['status'] != 200) {
+      return this.errorRequestDialog();
+    }
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MainHomePage()));
+  }
+
+  reproveProof() async{
+    Map<String, dynamic> response = await _api.reproveProof(item.id);
 
     if (response['status'] != 200) {
       return this.errorRequestDialog();
