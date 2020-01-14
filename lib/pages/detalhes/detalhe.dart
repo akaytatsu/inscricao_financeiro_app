@@ -6,38 +6,47 @@ import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dar
 import 'package:intl/intl.dart';
 
 class DetalhePage extends StatefulWidget {
-  final SolicitacaoSerializer item;
-  final String title;
-  final Color color;
+  final int id;
 
-  DetalhePage({Key key, @required this.item, @required this.title, @required this.color})
+  DetalhePage({Key key, @required this.id})
       : super(key: key);
 
   @override
   _DetalhePageState createState() =>
-      _DetalhePageState(item: this.item, title: this.title, color: this.color);
+      _DetalhePageState(id: this.id);
 }
 
 class _DetalhePageState extends State<DetalhePage> {
-  final SolicitacaoSerializer item;
-  final String title;
-  final Color color;
+  final int id;
+  SolicitacaoSerializer item = new SolicitacaoSerializer();
 
   final List<Widget> buttons = new List();
   AccountSerializer user = new AccountSerializer();
   
   RestApi _api = RestApi();
   
-  _DetalhePageState({this.item, this.title, this.color});
+  _DetalhePageState({@required this.id});
 
-  Future<AccountSerializer> getUserInfo() async{
+  getUserInfo() async{
     var response = await _api.me();
 
     if( response['status'] == 200 ){
       user = response['data'];
     }
+  }
 
-    return user;
+  Future<SolicitacaoSerializer> buscaSolicitacao() async{
+
+    await getUserInfo();
+
+    var response = await _api.getSolicitacao(this.id);
+
+    if( response['status'] == 200 ){
+      item = response['data'];
+      return item;
+    }
+
+    return null;
   }
 
   configButtons(){
@@ -81,11 +90,11 @@ class _DetalhePageState extends State<DetalhePage> {
             ]),
         margin: EdgeInsets.only(left: 10, right: 10, top: 90),
         child: Center(
-          child: Text(this.title,
+          child: Text(item.statusTitulo(),
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: this.color)),
+                  color: item.statusColor())),
         ),
       ),
     );
@@ -112,7 +121,7 @@ class _DetalhePageState extends State<DetalhePage> {
       children: <Widget>[
         Container(
           decoration: BoxDecoration(
-            color: this.color,
+            color: item.statusColor(),
           ),
           height: 137,
           width: MediaQuery.of(context).size.width,
@@ -309,8 +318,8 @@ class _DetalhePageState extends State<DetalhePage> {
       backgroundColor: Color(0xFFF2F4F8),
       appBar: null,
       body: FutureBuilder(
-        future: getUserInfo(),
-        builder: (BuildContext context, AsyncSnapshot<AccountSerializer> snapshot) {
+        future: buscaSolicitacao(),
+        builder: (BuildContext context, AsyncSnapshot<SolicitacaoSerializer> snapshot) {
 
           if(!snapshot.hasData){
             return ListView();

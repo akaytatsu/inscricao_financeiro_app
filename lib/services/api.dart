@@ -8,7 +8,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RestApi {
-  String urlBase = "http://inscricao.igrejaemcontagem.com.br/";
+  String urlBase = "http://192.168.25.221:9000/";
+  // String urlBase = "http://inscricao.igrejaemcontagem.com.br/";
 
   Future<Map<String, String>> _headers({Map<String, String> headers, logged = true}) async{
     if(headers == null){
@@ -199,6 +200,21 @@ class RestApi {
       return this.responseObject(
         response.statusCode, 
         data: ( json.decode(response.body) as List).map((data) => SolicitacaoSerializer.fromJson(data)).toList() );
+    }else{
+      return this.responseObject(
+        response.statusCode, 
+        error: response.body );
+    }
+  }
+
+  Future<Map<String, dynamic>> getSolicitacao(int id) async {
+    final url = 'api/financeiro/solicitacao?id='+id.toString();
+    final response = await this._get(url, logged: true);
+ 
+    if(response.statusCode == 200){
+      return this.responseObject(
+        response.statusCode, 
+        data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
     }else{
       return this.responseObject(
         response.statusCode, 

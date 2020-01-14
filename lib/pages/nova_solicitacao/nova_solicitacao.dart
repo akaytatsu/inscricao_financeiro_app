@@ -15,31 +15,41 @@ class NovaSolicitacaoPage extends StatefulWidget {
 class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
   final _description = TextEditingController();
   final _price = TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
+
   List<DropdownMenuItem<ConferenciaSerializer>> _dropDownConferencia = new List();
   ConferenciaSerializer _currentConferencia;
 
   RestApi _api = RestApi();
 
-  Future<List<ConferenciaSerializer>> buscaConferencias() async{
+  buscaConferencias() async{
 
     var response = await _api.getConferencias();
     List<ConferenciaSerializer> conferencias = [];
 
     if( response['status'] == 200 ){
       conferencias = response['data'];
+      _currentConferencia = conferencias[0];
     }
-
-    return conferencias;
 
   }
 
-  textField(label, TextEditingController controller,
-      {String placeholder = ""}) {
+  textField(label, TextEditingController controller, {String placeholder = "", bool isNumber = false}) {
     final labelStyle = TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.bold,
       color: Color(0xFF4080FE),
     );
+
+    TextInputType keyboard;
+
+    if(isNumber){
+      keyboard = TextInputType.numberWithOptions(
+        decimal: true,
+        signed: false
+      );
+    }
 
     return Container(
       margin: EdgeInsets.only(top: 20),
@@ -53,9 +63,16 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
               style: labelStyle,
             ),
           ),
-          TextField(
+          TextFormField(
             controller: controller,
             decoration: InputDecoration(hintText: placeholder),
+            keyboardType: keyboard,
+            validator: (value){
+              if (value.isEmpty) {
+                return 'Valor não informado';
+              }
+              return null;
+            },
           )
         ],
       ),
@@ -68,16 +85,29 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
     });
   }
 
+  double parseValue(String value){
+
+    return double.parse(value.replaceAll(".", "").replaceAll(",", "."));
+
+  }
+
   actionRegister() async {
-    Map<String, dynamic> response =
-    await _api.newSolicitation(_description.text, double.parse(_price.text), _currentConferencia.id, context: context);
 
-    if (response['status'] != 200) {
-      return this.errorRegisterSolicitationDialog();
+    if (_formKey.currentState.validate()) {
+
+      await buscaConferencias();
+
+      Map<String, dynamic> response =
+      await _api.newSolicitation(_description.text, this.parseValue(_price.text), _currentConferencia.id, context: context);
+
+      if (response['status'] != 200) {
+        return this.errorRegisterSolicitationDialog();
+      }
+
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => IntermdiareScreen()));
+
     }
-
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => IntermdiareScreen()));
   }
 
   btn(label, color, Function action) {
@@ -150,51 +180,28 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
           "Finanças Conferência IEC",
         ),
       ),
-      body: ListView(
-        children: [
-          Padding(padding: EdgeInsets.only(top: 20),),
-          Container(
-            child: Center(
-              child: MainMenu(defaultSelected: 2,),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          children: [
+            Padding(padding: EdgeInsets.only(top: 20),),
+            Container(
+              child: Center(
+                child: MainMenu(defaultSelected: 2,),
+              ),
             ),
-          ),
-          Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                this.textField("DESCRIÇÃO", this._description, placeholder: "Descrição"),
-                this.textField("VALOR", this._price, placeholder: "Valor"),
-                FutureBuilder(
-                    future: buscaConferencias(),
-                    builder: (BuildContext context, AsyncSnapshot<List<ConferenciaSerializer>> snapshot){
-
-                      if(snapshot.hasData){
-                        for (ConferenciaSerializer item in snapshot.data) {
-                          print(item.titulo);
-                          _dropDownConferencia.add(new DropdownMenuItem(
-                              value: item,
-                              child: new Text(item.titulo)
-                          ));
-                        }
-
-                        _currentConferencia = snapshot.data[0];
-
-                        return new DropdownButton(
-                          value: _currentConferencia,
-                          items: _dropDownConferencia,
-                          onChanged: changedDropDownItem,
-                        );
-                      }
-
-                      return new DropdownButton(items: [], onChanged: null);
-
-                    }
-                ),
-                this.btnRegister()
-              ],
+            Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  this.textField("Justificativa", this._description, placeholder: "Descrição"),
+                  this.textField("Valor", this._price, placeholder: "Valor", isNumber: true),
+                  this.btnRegister()
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

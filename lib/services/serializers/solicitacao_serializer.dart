@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class SolicitacaoSerializer {
     int id;
     Solicitante solicitante;
@@ -60,6 +62,96 @@ class SolicitacaoSerializer {
         "usuario_comprovacao": usuarioComprovacao,
         "categoria": categoria,
     };
+
+  String statusTitulo() {
+    String statusStr = "";
+
+    switch (this.status) {
+      case 1:
+        statusStr = "Aguardando Aprovação";
+        break;
+      case 2:
+        statusStr = "Aprovado";
+        break;
+      case 3:
+        statusStr = "Recurso Repassado";
+        break;
+      case 4:
+        statusStr = "Aguardando Comprovação";
+        break;
+      case 5:
+        statusStr = "Comprovação em Analise";
+        break;
+      case 6:
+        statusStr = "Comprovado";
+        break;
+      case 8:
+        statusStr = "Reprovado";
+        break;
+      default:
+        statusStr = "";
+    }
+
+    return statusStr;
+  }
+
+  Color statusColor(){
+    Color color;
+
+    if (status == 1) {
+      color = Color(0xFF857E7E);
+    } else if (status == 2) {
+      color = Color(0xFF3977FF);
+    } else if (status == 3 || status == 4) {
+      color = Color(0xFFB48508);
+    } else if (status == 5) {
+      color = Color(0xFF7008B4);
+    } else if (status == 6) {
+      color = Color(0xFF02A212);
+    } else if (status == 8) {
+      color = Color(0xFFDB0404);
+    }
+
+    return color;
+  }
+
+  List<Color> listColors() {
+    List<Color> colors;
+
+    if (status == 1) {
+      colors = [
+        Color(0xFF857E7E),
+        Color(0xFF656161),
+      ];
+    } else if (status == 2) {
+      colors = [
+        Color(0xFF3977FF),
+        Color(0xFF1C55D4),
+      ];
+    } else if (status == 3 || status == 4) {
+      colors = [
+        Color(0xFFB48508),
+        Color(0xFFA77A03),
+      ];
+    } else if (status == 5) {
+      colors = [
+        Color(0xFF7008B4),
+        Color(0xFF450171),
+      ];
+    } else if (status == 6) {
+      colors = [
+        Color(0xFF02A212),
+        Color(0xFF008D0E),
+      ];
+    } else if (status == 8) {
+      colors = [
+        Color(0xFFDB0404),
+        Color(0xFFB50404),
+      ];
+    }
+
+    return colors;
+  }
 }
 
 class Solicitante {

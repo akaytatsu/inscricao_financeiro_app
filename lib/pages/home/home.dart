@@ -1,6 +1,7 @@
 import 'package:iec_despesas_app/components/solicitacao_box.dart';
 import 'package:flutter/material.dart';
 import 'package:iec_despesas_app/main.dart';
+import 'package:iec_despesas_app/pages/detalhes/detalhe.dart';
 import 'package:iec_despesas_app/pages/home/components/menu.dart';
 import 'package:iec_despesas_app/services/api.dart';
 import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
@@ -40,8 +41,7 @@ class _MainHomePageState extends State<MainHomePage> {
       return;
     }
 
-    // Samuel a notificação é aqui
-    // Navigator.push(context, MaterialPageRoute(builder: (_) => DetalhePage()))
+    Navigator.push(context, MaterialPageRoute(builder: (_) => DetalhePage(id: requestId,)));
   }
 
   void initOneSignal() async{
