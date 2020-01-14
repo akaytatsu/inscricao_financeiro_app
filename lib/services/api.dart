@@ -232,7 +232,7 @@ class RestApi {
     var request = http.MultipartRequest("POST", Uri.parse(url));
 
     request.files.add(new http.MultipartFile.fromBytes(
-    'image',
+    'comprovante',
     await image.readAsBytes(),
     filename: name));
 
