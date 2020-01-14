@@ -256,7 +256,7 @@ class _DetalhePageState extends State<DetalhePage> {
 
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
-    Map<String, dynamic> response = await _api.uploadComprovante(image, item.id);
+    await _api.uploadComprovante(image, item.id);
 
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => MainHomePage()));
