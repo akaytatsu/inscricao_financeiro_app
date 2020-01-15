@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:iec_despesas_app/pages/comprovante/comprovante.dart';
 import 'package:iec_despesas_app/pages/home/home.dart';
 import 'package:iec_despesas_app/services/api.dart';
 import 'package:iec_despesas_app/services/serializers/account_serializers.dart';
 import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 class DetalhePage extends StatefulWidget {
   final int id;
@@ -161,6 +163,62 @@ class _DetalhePageState extends State<DetalhePage> {
     );
   }
 
+  Widget linkComprovante(String comprovante) {
+
+    final double fontSize = 15;
+
+    return Container(
+      margin: EdgeInsets.only(left: 20, top: 10),
+      padding: EdgeInsets.only(right: 10),
+      child: Row(
+        children: <Widget>[
+          Text("Comprovante: ",
+              style: TextStyle(color: Color(0xFFACA4A4), fontSize: fontSize)),
+          Expanded(
+            child: GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (_) => ComprovantePage(comprovante: comprovante,)));
+              },
+              child: Text("Clique para ver",
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.bold)),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget linkTelefone(String telefone) {
+
+    final double fontSize = 15;
+
+    return Container(
+      margin: EdgeInsets.only(left: 20, top: 10),
+      padding: EdgeInsets.only(right: 10),
+      child: Row(
+        children: <Widget>[
+          Text("Telefone: ",
+              style: TextStyle(color: Color(0xFFACA4A4), fontSize: fontSize)),
+          Expanded(
+            child: GestureDetector(
+              onTap: (){
+                UrlLauncher.launch("tel://$telefone");
+              },
+              child: Text(telefone,
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.bold)),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget detalhes() {
     Widget titulo = Container(
       decoration: BoxDecoration(
@@ -196,11 +254,15 @@ class _DetalhePageState extends State<DetalhePage> {
             Padding(
               padding: EdgeInsets.only(top: 15),
             ),
+            detalheELabel("Código", this.item.id.toString()),
             detalheELabel("Solicitante", this.item.solicitante.name),
+            this.item.solicitante.telefone == null || this.item.solicitante.telefone == "" ? Container() : linkTelefone(this.item.solicitante.telefone),
             detalheELabel("Data Solicitação", DateFormat("dd/MM/yyyy", "en_US").format(this.item.dataSolicitacao)),
-            detalheELabel("Valor", "R\$" + new NumberFormat("#,###.00").format(item.valor)),
-            detalheELabel("Categoria", item.categoria),
+            detalheELabel("Valor", "R\$ " + new NumberFormat("#,###.00").format(item.valor)),
+            item.categoria == null || item.categoria == "" ? Container() : detalheELabel("Categoria", item.categoria),
             detalheELabel("Justificativa", item.justificativa),
+            item.justificativaReprovacao == null || item.justificativaReprovacao == "" ? Container() : detalheELabel("Justificativa Reprovação", item.justificativaReprovacao),
+            item.comprovante == null || item.comprovante == "" ? Container() : linkComprovante(item.comprovante),
             Padding(
               padding: EdgeInsets.only(bottom: 25),
             )
@@ -329,6 +391,9 @@ class _DetalhePageState extends State<DetalhePage> {
   }
 
   List<Widget> buildChildren() {
+
+    // configButtons();
+
     var builder = <Widget>[
       topo(),
       Padding(
@@ -336,11 +401,19 @@ class _DetalhePageState extends State<DetalhePage> {
       ),
       detalhes(),
 
-      Padding(padding: EdgeInsets.only(top: 30))
-    ];
+      Padding(padding: EdgeInsets.only(top: 30)),
 
-    configButtons();
-    buttons.forEach((b) => builder.add(b));
+      (item.status == 1 && user.canAprove) ? btn("Aprovar Solicitação", Icons.check, approve) : Container(),
+      (item.status == 1 && user.canAprove) ? btn("Reprovar Solicitação", Icons.close, reprove) : Container(),
+
+      (item.status == 2 && user.canPay) ? btn("Confirmar Repasse Recurso", Icons.monetization_on, confirmTransferMoney) : Container(),
+
+      (item.status == 3 || item.status == 4) ? btn("Selecionar Comprovante", Icons.add_a_photo, selecionaComprovantes) : Container(),
+
+      (item.status == 5 && user.canAprove) ? btn("Confirmar Comprovação", Icons.check_circle, confirmProof) : Container(),
+      (item.status == 5 && user.canAprove) ? btn("Recusar Comprovação", Icons.reply, reproveProof) : Container(),
+      
+    ];
 
     return builder;
   }

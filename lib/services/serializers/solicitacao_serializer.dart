@@ -6,6 +6,7 @@ class SolicitacaoSerializer {
     int status;
     double valor;
     String justificativa;
+    String justificativaReprovacao;
     bool aprovado;
     bool comprovado;
     DateTime dataSolicitacao;
@@ -14,6 +15,7 @@ class SolicitacaoSerializer {
     dynamic usuarioAprovacao;
     dynamic usuarioComprovacao;
     dynamic categoria;
+    String comprovante;
 
     SolicitacaoSerializer({
         this.id,
@@ -21,6 +23,7 @@ class SolicitacaoSerializer {
         this.status,
         this.valor,
         this.justificativa,
+        this.justificativaReprovacao,
         this.aprovado,
         this.comprovado,
         this.dataSolicitacao,
@@ -29,6 +32,7 @@ class SolicitacaoSerializer {
         this.usuarioAprovacao,
         this.usuarioComprovacao,
         this.categoria,
+        this.comprovante,
     });
 
     factory SolicitacaoSerializer.fromJson(Map<String, dynamic> json) => SolicitacaoSerializer(
@@ -37,11 +41,13 @@ class SolicitacaoSerializer {
         status: json["status"] == null ? null : json["status"],
         valor: json["valor"] == null ? null : json["valor"],
         justificativa: json["justificativa"] == null ? null : json["justificativa"],
+        justificativaReprovacao: json["justificativa_reprovacao"] == null ? null : json["justificativa_reprovacao"],
         aprovado: json["aprovado"] == null ? null : json["aprovado"],
         comprovado: json["comprovado"] == null ? null : json["comprovado"],
         dataSolicitacao: json["data_solicitacao"] == null ? null : DateTime.parse(json["data_solicitacao"]),
         conferencia: json["conferencia"] == null ? null : json["conferencia"],
         usuarioSolicitacao: json["usuario_solicitacao"] == null ? null : json["usuario_solicitacao"],
+        comprovante: json["comprovante"] == null ? null : json["comprovante"],
         usuarioAprovacao: json["usuario_aprovacao"],
         usuarioComprovacao: json["usuario_comprovacao"],
         categoria: json["categoria"],
@@ -53,6 +59,7 @@ class SolicitacaoSerializer {
         "status": status == null ? null : status,
         "valor": valor == null ? null : valor,
         "justificativa": justificativa == null ? null : justificativa,
+        "justificativa_reprovacao": justificativaReprovacao == null ? null : justificativaReprovacao,
         "aprovado": aprovado == null ? null : aprovado,
         "comprovado": comprovado == null ? null : comprovado,
         "data_solicitacao": dataSolicitacao == null ? null : dataSolicitacao.toIso8601String(),
@@ -61,6 +68,7 @@ class SolicitacaoSerializer {
         "usuario_aprovacao": usuarioAprovacao,
         "usuario_comprovacao": usuarioComprovacao,
         "categoria": categoria,
+        "comprovante": comprovante,
     };
 
   String statusTitulo() {

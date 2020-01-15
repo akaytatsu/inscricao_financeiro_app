@@ -32,6 +32,15 @@ class SolicitacaoBox extends StatelessWidget {
     );
   }
 
+  Widget idSolicitacaoWidget() {
+    var textStyle = TextStyle(color: Colors.white, fontSize: 20);
+
+    return Text(
+      "ID: " + item.id.toString(),
+      style: textStyle,
+    );
+  }
+
   Widget valorSolicitacaoWidget() {
     var valueTextStyle = TextStyle(color: Colors.white, fontSize: 20);
 
@@ -104,6 +113,7 @@ class SolicitacaoBox extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
+                    idSolicitacaoWidget(),
                     dataSolicitacaoWidget(),
                     valorSolicitacaoWidget()
                   ],

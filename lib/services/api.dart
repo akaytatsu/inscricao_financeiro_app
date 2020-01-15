@@ -32,7 +32,7 @@ class RestApi {
     return headers;
   }
 
-  _post(String url, {Map params, Map<String, String> headers, bool logged = true}) async {
+  Future<http.Response> _post(String url, {Map params, Map<String, String> headers, bool logged = true}) async {
     url = this.urlBase + url;
 
     headers = await _headers(headers: headers, logged: logged);
@@ -40,7 +40,7 @@ class RestApi {
     return http.post(url, body: json.encode(params), headers: headers);
   }
 
-  _put(String url, {Map params, Map<String, String> headers, bool logged = true}) async {
+  Future<http.Response> _put(String url, {Map params, Map<String, String> headers, bool logged = true}) async {
     url = this.urlBase + url;
 
     headers = await _headers(headers: headers, logged: logged);
@@ -48,7 +48,7 @@ class RestApi {
     return http.put(url, body: json.encode(params), headers: headers);
   }
 
-  _get(String url, {Map<String, String> headers, bool logged = true}) async {
+  Future<http.Response> _get(String url, {Map<String, String> headers, bool logged = true}) async {
     url = this.urlBase + url;
 
     headers = await _headers(headers: headers, logged: logged);
@@ -81,11 +81,11 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
         response.statusCode, 
-        data: AccountSerializer.fromJson(json.decode(response.body)) );
+        data: AccountSerializer.fromJson(json.decode(utf8.decode(response.bodyBytes))) );
     }else{
       return this.responseObject(
         response.statusCode, 
-        error: response.body );
+        error: utf8.decode(response.bodyBytes) );
     }
   }
 
@@ -96,11 +96,11 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
         response.statusCode, 
-        data: AccountSerializer.fromJson(json.decode(response.body)) );
+        data: AccountSerializer.fromJson(json.decode(utf8.decode(response.bodyBytes))) );
     }else{
       return this.responseObject(
         response.statusCode, 
-        error: response.body );
+        error: utf8.decode(response.bodyBytes) );
     }
   }
 
@@ -115,7 +115,7 @@ class RestApi {
  
     if(response.statusCode == 200){
 
-      AuthTokenSerializer serializer = AuthTokenSerializer.fromJson(json.decode(response.body));
+      AuthTokenSerializer serializer = AuthTokenSerializer.fromJson(json.decode(utf8.decode(response.bodyBytes)));
 
       prefs.setString("jwt", serializer.token);
       prefs.setBool("logged", true);
@@ -133,7 +133,7 @@ class RestApi {
 
       return this.responseObject(
         response.statusCode, 
-        error: response.body );
+        error: utf8.decode(response.bodyBytes) );
     }
   }
 
@@ -169,11 +169,11 @@ class RestApi {
     }else if(response.statusCode == 400){
       return this.responseObject(
         response.statusCode, 
-        error: CreateAccountErrorSerializer.fromJson(json.decode(response.body)));
+        error: CreateAccountErrorSerializer.fromJson(json.decode(utf8.decode(response.bodyBytes))));
     }else{
       return this.responseObject(
         response.statusCode, 
-        error: json.decode(response.body) );
+        error: json.decode(utf8.decode(response.bodyBytes)) );
     }
   }
 
@@ -200,11 +200,11 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
         response.statusCode, 
-        data: ( json.decode(response.body) as List).map((data) => SolicitacaoSerializer.fromJson(data)).toList() );
+        data: ( json.decode(utf8.decode(response.bodyBytes)) as List).map((data) => SolicitacaoSerializer.fromJson(data)).toList() );
     }else{
       return this.responseObject(
         response.statusCode, 
-        error: response.body );
+        error: utf8.decode(response.bodyBytes) );
     }
   }
 
@@ -215,11 +215,11 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
         response.statusCode, 
-        data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+        data: SolicitacaoSerializer.fromJson(json.decode(utf8.decode(response.bodyBytes))) );
     }else{
       return this.responseObject(
         response.statusCode, 
-        error: response.body );
+        error: utf8.decode(response.bodyBytes) );
     }
   }
 
@@ -255,11 +255,11 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
           response.statusCode,
-          data: ( json.decode(response.body) as List).map((data) => ConferenciaSerializer.fromJson(data)).toList() );
+          data: ( json.decode(utf8.decode(response.bodyBytes)) as List).map((data) => ConferenciaSerializer.fromJson(data)).toList() );
     }else{
       return this.responseObject(
           response.statusCode,
-          error: response.body );
+          error: utf8.decode(response.bodyBytes) );
     }
   }
 
@@ -275,11 +275,11 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
           response.statusCode,
-          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+          data: SolicitacaoSerializer.fromJson(json.decode(utf8.decode(response.bodyBytes))) );
     }else{
       return this.responseObject(
           response.statusCode,
-          error: response.body );
+          error: utf8.decode(response.bodyBytes) );
     }
   }
 
@@ -292,11 +292,11 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
           response.statusCode,
-          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+          data: SolicitacaoSerializer.fromJson(json.decode(utf8.decode(response.bodyBytes))) );
     }else{
       return this.responseObject(
           response.statusCode,
-          error: response.body );
+          error: utf8.decode(response.bodyBytes) );
     }
   }
 
@@ -309,11 +309,11 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
           response.statusCode,
-          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+          data: SolicitacaoSerializer.fromJson(json.decode(utf8.decode(response.bodyBytes))) );
     }else{
       return this.responseObject(
           response.statusCode,
-          error: response.body );
+          error: utf8.decode(response.bodyBytes) );
     }
   }
 
@@ -338,7 +338,7 @@ class RestApi {
     }else{
       return this.responseObject(
           response.statusCode,
-          error: response.body );
+          error: utf8.decode(response.bodyBytes) );
     }
 
   }
@@ -352,11 +352,11 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
           response.statusCode,
-          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+          data: SolicitacaoSerializer.fromJson(json.decode(utf8.decode(response.bodyBytes))) );
     }else{
       return this.responseObject(
           response.statusCode,
-          error: response.body );
+          error: utf8.decode(response.bodyBytes) );
     }
 
   }
@@ -370,11 +370,11 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
           response.statusCode,
-          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+          data: SolicitacaoSerializer.fromJson(json.decode(utf8.decode(response.bodyBytes))) );
     }else{
       return this.responseObject(
           response.statusCode,
-          error: response.body );
+          error: utf8.decode(response.bodyBytes) );
     }
 
   }
@@ -388,11 +388,11 @@ class RestApi {
     if(response.statusCode == 200){
       return this.responseObject(
           response.statusCode,
-          data: SolicitacaoSerializer.fromJson(json.decode(response.body)) );
+          data: SolicitacaoSerializer.fromJson(json.decode(utf8.decode(response.bodyBytes))) );
     }else{
       return this.responseObject(
           response.statusCode,
-          error: response.body );
+          error: utf8.decode(response.bodyBytes) );
     }
 
   }
