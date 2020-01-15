@@ -25,6 +25,8 @@ class _DetalhePageState extends State<DetalhePage> {
 
   final List<Widget> buttons = new List();
   AccountSerializer user = new AccountSerializer();
+
+  TextEditingController reproveJustify = TextEditingController();
   
   RestApi _api = RestApi();
   
@@ -303,8 +305,66 @@ class _DetalhePageState extends State<DetalhePage> {
         context, MaterialPageRoute(builder: (context) => MainHomePage()));
   }
 
+  reproveModal(){
+    Dialog reproveDialog = Dialog(
+      child: Container(
+        height: 300.0,
+        width: 300.0,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(15.0),
+              child: TextField(
+                maxLines: 2,
+                decoration: InputDecoration(hintText: "Justificativa"),
+                controller: reproveJustify,
+                
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10, top: 50),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  RaisedButton(
+                    color: Colors.blue,
+                    onPressed: () {
+                      reprove();
+                    },
+                    child: Text(
+                      'Reprovar',
+                      style: TextStyle(fontSize: 18.0, color: Colors.white),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  RaisedButton(
+                    color: Colors.red,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      'Cancelar',
+                      style: TextStyle(fontSize: 18.0, color: Colors.white),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => reproveDialog);
+  }
+
   reprove() async{
-    Map<String, dynamic> response = await _api.reprove(item.id);
+
+    Map<String, dynamic> response = await _api.reprove(item.id, reproveJustify.text);
 
     if (response['status'] != 200) {
       return this.errorRequestDialog();
@@ -392,8 +452,6 @@ class _DetalhePageState extends State<DetalhePage> {
 
   List<Widget> buildChildren() {
 
-    // configButtons();
-
     var builder = <Widget>[
       topo(),
       Padding(
@@ -404,7 +462,7 @@ class _DetalhePageState extends State<DetalhePage> {
       Padding(padding: EdgeInsets.only(top: 30)),
 
       (item.status == 1 && user.canAprove) ? btn("Aprovar Solicitação", Icons.check, approve) : Container(),
-      (item.status == 1 && user.canAprove) ? btn("Reprovar Solicitação", Icons.close, reprove) : Container(),
+      (item.status == 1 && user.canAprove) ? btn("Reprovar Solicitação", Icons.close, reproveModal) : Container(),
 
       (item.status == 2 && user.canPay) ? btn("Confirmar Repasse Recurso", Icons.monetization_on, confirmTransferMoney) : Container(),
 

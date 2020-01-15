@@ -300,10 +300,11 @@ class RestApi {
     }
   }
 
-  Future<Map<String, dynamic>> reprove(int solicitationId, {context}) async {
+  Future<Map<String, dynamic>> reprove(int solicitationId, String justificativa, {context}) async {
     final url = 'api/financeiro/reprova_solicitacao/';
     final response = await this._put(url, params: {
-      "pk": solicitationId
+      "pk": solicitationId,
+      "justificativa": justificativa
     });
 
     if(response.statusCode == 200){
