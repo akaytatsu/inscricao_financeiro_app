@@ -6,6 +6,7 @@ import 'package:iec_despesas_app/services/serializers/account_serializers.dart';
 import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:load/load.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 class DetalhePage extends StatefulWidget {
@@ -295,7 +296,12 @@ class _DetalhePageState extends State<DetalhePage> {
   }
 
   approve() async{
+
+    await showLoadingDialog();
+
     Map<String, dynamic> response = await _api.approve(item.id);
+
+    hideLoadingDialog();
 
     if (response['status'] != 200) {
       return this.errorRequestDialog();
@@ -364,7 +370,11 @@ class _DetalhePageState extends State<DetalhePage> {
 
   reprove() async{
 
+    await showLoadingDialog();
+
     Map<String, dynamic> response = await _api.reprove(item.id, reproveJustify.text);
+
+    hideLoadingDialog();
 
     if (response['status'] != 200) {
       return this.errorRequestDialog();
@@ -385,7 +395,12 @@ class _DetalhePageState extends State<DetalhePage> {
   }
 
   confirmTransferMoney() async{
+
+    await showLoadingDialog();
+
     Map<String, dynamic> response = await _api.confirmTransferMoney(item.id);
+
+    hideLoadingDialog();
 
     if (response['status'] != 200) {
       return this.errorRequestDialog();
@@ -396,7 +411,12 @@ class _DetalhePageState extends State<DetalhePage> {
   }
 
   confirmProof() async{
+
+    await showLoadingDialog();
+    
     Map<String, dynamic> response = await _api.confirmProof(item.id);
+
+    hideLoadingDialog();
 
     if (response['status'] != 200) {
       return this.errorRequestDialog();
@@ -407,7 +427,11 @@ class _DetalhePageState extends State<DetalhePage> {
   }
 
   reproveProof() async{
+    await showLoadingDialog();
+    
     Map<String, dynamic> response = await _api.reproveProof(item.id);
+
+    hideLoadingDialog();
 
     if (response['status'] != 200) {
       return this.errorRequestDialog();
@@ -452,6 +476,12 @@ class _DetalhePageState extends State<DetalhePage> {
 
   List<Widget> buildChildren() {
 
+    String repasseLabel = "Confirmar Repasse Recurso";
+
+    if(user.id == item.solicitante.id){
+      repasseLabel = 'Confirmar Recebimento Recurso';
+    }
+
     var builder = <Widget>[
       topo(),
       Padding(
@@ -464,7 +494,7 @@ class _DetalhePageState extends State<DetalhePage> {
       (item.status == 1 && user.canAprove) ? btn("Aprovar Solicitação", Icons.check, approve) : Container(),
       (item.status == 1 && user.canAprove) ? btn("Reprovar Solicitação", Icons.close, reproveModal) : Container(),
 
-      (item.status == 2 && user.canPay) ? btn("Confirmar Repasse Recurso", Icons.monetization_on, confirmTransferMoney) : Container(),
+      (item.status == 2 && (user.canPay || user.id == item.solicitante.id)) ? btn(repasseLabel, Icons.monetization_on, confirmTransferMoney) : Container(),
 
       (item.status == 3 || item.status == 4) ? btn("Selecionar Comprovante", Icons.add_a_photo, selecionaComprovantes) : Container(),
 

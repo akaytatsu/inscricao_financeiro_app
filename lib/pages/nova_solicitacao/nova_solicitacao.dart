@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:iec_despesas_app/pages/home/components/menu.dart';
 import 'package:iec_despesas_app/services/api.dart';
 import 'package:iec_despesas_app/services/serializers/conferencia_serializer.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
+import 'package:load/load.dart';
 
 import '../../main.dart';
 
@@ -13,12 +19,11 @@ class NovaSolicitacaoPage extends StatefulWidget {
 }
 
 class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+
   final _description = TextEditingController();
   final _price = TextEditingController();
 
-  final _formKey = GlobalKey<FormState>();
-
-  List<DropdownMenuItem<ConferenciaSerializer>> _dropDownConferencia = new List();
   ConferenciaSerializer _currentConferencia;
 
   RestApi _api = RestApi();
@@ -35,54 +40,44 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
 
   }
 
-  textField(label, TextEditingController controller, {String placeholder = "", bool isNumber = false}) {
-    final labelStyle = TextStyle(
-      fontSize: 18,
-      fontWeight: FontWeight.bold,
-      color: Color(0xFF4080FE),
-    );
-
-    TextInputType keyboard;
-
-    if(isNumber){
-      keyboard = TextInputType.numberWithOptions(
-        decimal: true,
-        signed: false
-      );
-    }
+  fieldContainer({Widget child}) {
 
     return Container(
       margin: EdgeInsets.only(top: 20),
-      constraints: BoxConstraints(maxWidth: 300),
-      child: Column(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.topLeft,
-            child: Text(
-              label,
-              style: labelStyle,
-            ),
-          ),
-          TextFormField(
-            controller: controller,
-            decoration: InputDecoration(hintText: placeholder),
-            keyboardType: keyboard,
-            validator: (value){
-              if (value.isEmpty) {
-                return 'Valor não informado';
-              }
-              return null;
-            },
-          )
-        ],
-      ),
+      constraints: BoxConstraints(maxWidth: 350),
+      child: child
     );
   }
 
   btnRegister() {
-    return this.btn("Cadastrar", 0xFF4080FE, () {
-      actionRegister();
-    });
+    // return this.btn("Cadastrar", 0xFF4080FE, () {
+    //   actionRegister();
+    // });
+
+    return GestureDetector(
+      onTap: () {
+        actionRegister();
+      },
+      child: Container(
+        margin: EdgeInsets.only(top: 20),
+        width: 300,
+        height: 45,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Color(0xFF4080FE),
+        ),
+        child: Center(
+          child: Text(
+            "Cadastrar",
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontFamily: "Roboto",
+                fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+    );
   }
 
   double parseValue(String value){
@@ -93,12 +88,19 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
 
   actionRegister() async {
 
-    if (_formKey.currentState.validate()) {
+    if (_fbKey.currentState.saveAndValidate()) {
+
+      await showLoadingDialog();
 
       await buscaConferencias();
 
+      double value = NumberFormat(("###,##")).parse( _fbKey.currentState.value['value'] ).toDouble() / 100;
+      String justify = _fbKey.currentState.value['value'];
+
       Map<String, dynamic> response =
-      await _api.newSolicitation(_description.text, this.parseValue(_price.text), _currentConferencia.id, context: context);
+      await _api.newSolicitation(justify, value, _currentConferencia.id, context: context);
+
+      hideLoadingDialog();
 
       if (response['status'] != 200) {
         return this.errorRegisterSolicitationDialog();
@@ -108,33 +110,6 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
           context, MaterialPageRoute(builder: (context) => IntermdiareScreen()));
 
     }
-  }
-
-  btn(label, color, Function action) {
-    return GestureDetector(
-      onTap: () {
-        action();
-      },
-      child: Container(
-        margin: EdgeInsets.only(top: 20),
-        width: 300,
-        height: 45,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: Color(color),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontFamily: "Roboto",
-                fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
-    );
   }
 
   errorRegisterSolicitationDialog() {
@@ -159,14 +134,51 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
         });
   }
 
-  void changedDropDownItem(ConferenciaSerializer selectedConferencia) {
-    if(_dropDownConferencia.isEmpty || _dropDownConferencia.length == 1){
-      return;
-    }
+  Widget formValue(){
 
-    setState(() {
-      _currentConferencia = selectedConferencia;
-    });
+    InputDecoration decorator = InputDecoration(
+      labelText: 'Valor Solicitado',
+      
+    );
+
+    TextStyle textStyle = TextStyle(
+      color: Colors.black
+    );
+
+    return FormBuilderTextField(
+      inputFormatters: [
+        NumericDoubleTextFormatter()
+      ],
+      attribute: 'value',
+      style: textStyle,
+      decoration: decorator,
+      keyboardType: TextInputType.number,
+      
+      validators: [
+        FormBuilderValidators.required()
+      ],
+    );
+  }
+
+  Widget formJustify(){
+
+    InputDecoration decorator = InputDecoration(
+      labelText: 'Justificativa',
+      
+    );
+
+    TextStyle textStyle = TextStyle(
+      color: Colors.black
+    );
+
+    return FormBuilderTextField(
+      attribute: 'justify',
+      style: textStyle,
+      decoration: decorator,      
+      validators: [
+        FormBuilderValidators.required()
+      ],
+    );
   }
 
   @override
@@ -180,8 +192,8 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
           "Finanças Conferência IEC",
         ),
       ),
-      body: Form(
-        key: _formKey,
+      body: FormBuilder(
+        key: _fbKey,
         child: ListView(
           children: [
             Padding(padding: EdgeInsets.only(top: 20),),
@@ -194,8 +206,8 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  this.textField("Justificativa", this._description, placeholder: "Descrição"),
-                  this.textField("Valor", this._price, placeholder: "Valor", isNumber: true),
+                  fieldContainer(child: formJustify()),
+                  fieldContainer(child: formValue()),
                   this.btnRegister()
                 ],
               ),
@@ -204,5 +216,25 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
         ),
       ),
     );
+  }
+}
+
+class NumericDoubleTextFormatter extends TextInputFormatter {
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.length == 0) {
+      return newValue.copyWith(text: '');
+    } else if (newValue.text.compareTo(oldValue.text) != 0) {
+      int selectionIndexFromTheRight = newValue.text.length - newValue.selection.end;
+      final f = new NumberFormat("#,###,##");
+      int num = int.parse(newValue.text.replaceAll(f.symbols.GROUP_SEP, ''));
+      final newString = f.format(num);
+      return new TextEditingValue(
+        text: newString,
+        selection: TextSelection.collapsed(offset: newString.length - selectionIndexFromTheRight),
+      );
+    } else {
+      return newValue;
+    }
   }
 }

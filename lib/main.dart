@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:iec_despesas_app/pages/home/home.dart';
 import 'package:iec_despesas_app/pages/login/login_page.dart';
 import 'package:iec_despesas_app/services/api.dart';
+import 'package:load/load.dart';
 import 'package:provider/provider.dart';
 import './provider/user_provider.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(new MainPage());
+  runApp(LoadingProvider(child: MainPage(),));
 }
 
 class MainPage extends StatelessWidget {
