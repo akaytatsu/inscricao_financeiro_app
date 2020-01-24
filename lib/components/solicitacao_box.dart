@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 
 class SolicitacaoBox extends StatelessWidget {
   final SolicitacaoSerializer item;
+  AnimationController controller;
+  Animation<double> animation;
 
   SolicitacaoBox(
       {Key key, @required this.item})
@@ -78,49 +80,158 @@ class SolicitacaoBox extends StatelessWidget {
     );
   }
 
+  Widget statusRound(){
+    return Container(
+      decoration: BoxDecoration(
+        color: item.statusColor(),
+        borderRadius: BorderRadius.all(Radius.circular(100))
+      ),
+      width: 15,
+      height: 15,
+    );
+  }
+
+  Widget memberDetails(){
+
+    var solicitanteNome = Text(
+      item.solicitante.name,
+      style: TextStyle(
+        fontSize: 18
+      )
+    );
+
+    var status = Text(
+      item.statusTitulo(),
+      style: TextStyle(
+        fontSize: 14
+      )
+    );
+
+    var descricao = Text(
+      item.justificativa.length > 27 ? item.justificativa.substring(0, 27) + "..." : item.justificativa,
+      style: TextStyle(
+        fontSize: 16
+      )
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        solicitanteNome,
+        descricao,
+        status,
+      ],
+    );
+  }
+
+  Widget valueDetails(){
+
+    Intl.defaultLocale = 'pt_BR';
+    var f = new NumberFormat("#,###.00");
+
+    String valor = "R\$: " + f.format(item.valor);
+
+    var valueDetail = Text(
+      valor,
+      style: TextStyle(
+        fontSize: 19
+      )
+    );
+
+    var date = Text(
+      DateFormat("dd/MM/yyyy", "en_US").format(item.dataSolicitacao.toLocal()),
+      style: TextStyle(
+        fontSize: 13
+      )
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        valueDetail,
+        Padding(padding: EdgeInsets.only(top: 5),),
+        date,
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    var decoration = BoxDecoration(
+      border: Border(
+        bottom: BorderSide(
+          color: Colors.black26,
+          width: 1
+        )
+      )
+    );
+
     return GestureDetector(
-      onTap: () {
+      onTap: (){
         Navigator.push(context, MaterialPageRoute(builder: (_) => DetalhePage(id: item.id)));
       },
       child: Container(
-        margin: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 10),
-        height: 110,
-        decoration: BoxDecoration(
-            gradient: gradientBackground(),
-            borderRadius: BorderRadiusDirectional.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.4),
-                blurRadius: 3,
-                offset: Offset(3, 3),
-              )
-            ]),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: EdgeInsets.only(right: 10, left: 10, bottom: 10, top: 10),
+        decoration: decoration,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(left: 50, top: 15),
-              child: nomeSolicitanteWidget(),
+            Row(
+              children: <Widget>[
+                statusRound(),
+                Padding(padding: EdgeInsets.only(right: 10),),
+                memberDetails(),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.only(left: 70, top: 5),
-              child: statusSolicitacaoWidget(),
-            ),
-            Padding(
-                padding: EdgeInsets.only(left: 30, top: 15, right: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    idSolicitacaoWidget(),
-                    dataSolicitacaoWidget(),
-                    valorSolicitacaoWidget()
-                  ],
-                )),
+            valueDetails(),
           ],
         ),
       ),
     );
+
+    // return GestureDetector(
+    //   onTap: () {
+    //     Navigator.push(context, MaterialPageRoute(builder: (_) => DetalhePage(id: item.id)));
+    //   },
+    //   child: Container(
+    //     margin: EdgeInsets.only(left: 0, right: 0, top: 10, bottom: 10),
+    //     height: 110,
+    //     decoration: BoxDecoration(
+    //         gradient: gradientBackground(),
+    //         borderRadius: BorderRadiusDirectional.circular(20),
+    //         boxShadow: [
+    //           BoxShadow(
+    //             color: Colors.black.withOpacity(0.4),
+    //             blurRadius: 3,
+    //             offset: Offset(3, 3),
+    //           )
+    //         ]),
+    //     child: Column(
+    //       crossAxisAlignment: CrossAxisAlignment.start,
+    //       children: <Widget>[
+    //         Padding(
+    //           padding: EdgeInsets.only(left: 50, top: 15),
+    //           child: nomeSolicitanteWidget(),
+    //         ),
+    //         Padding(
+    //           padding: EdgeInsets.only(left: 70, top: 5),
+    //           child: statusSolicitacaoWidget(),
+    //         ),
+    //         Padding(
+    //             padding: EdgeInsets.only(left: 30, top: 15, right: 20),
+    //             child: Row(
+    //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //               children: <Widget>[
+    //                 idSolicitacaoWidget(),
+    //                 dataSolicitacaoWidget(),
+    //                 valorSolicitacaoWidget()
+    //               ],
+    //             )),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }

@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:iec_despesas_app/pages/home/components/menu.dart';
 import 'package:iec_despesas_app/services/api.dart';
 import 'package:iec_despesas_app/services/serializers/conferencia_serializer.dart';
 import 'package:intl/intl.dart';
@@ -20,9 +17,6 @@ class NovaSolicitacaoPage extends StatefulWidget {
 
 class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
-
-  final _description = TextEditingController();
-  final _price = TextEditingController();
 
   ConferenciaSerializer _currentConferencia;
 
@@ -186,7 +180,6 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
     return Scaffold(
       backgroundColor: Color(0xFFF2F4F8),
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         centerTitle: true,
         title: Text(
           "Finanças Conferência IEC",
@@ -197,11 +190,6 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
         child: ListView(
           children: [
             Padding(padding: EdgeInsets.only(top: 20),),
-            Container(
-              child: Center(
-                child: MainMenu(defaultSelected: 2,),
-              ),
-            ),
             Container(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -1,8 +1,9 @@
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:iec_despesas_app/components/solicitacao_box.dart';
 import 'package:flutter/material.dart';
 import 'package:iec_despesas_app/main.dart';
 import 'package:iec_despesas_app/pages/detalhes/detalhe.dart';
-import 'package:iec_despesas_app/pages/home/components/menu.dart';
+import 'package:iec_despesas_app/pages/nova_solicitacao/nova_solicitacao.dart';
 import 'package:iec_despesas_app/services/api.dart';
 import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -15,7 +16,6 @@ class MainHomePage extends StatefulWidget {
 }
 
 class _MainHomePageState extends State<MainHomePage> {
-
   RestApi api = RestApi();
 
   Future<List<SolicitacaoSerializer>> buscaSolicitacoes() async{
@@ -83,6 +83,47 @@ class _MainHomePageState extends State<MainHomePage> {
     this.initOneSignal();
   }
 
+  Widget solicitacoes(){
+
+    return FutureBuilder(
+        future: buscaSolicitacoes(),
+        builder: (BuildContext context, AsyncSnapshot<List<SolicitacaoSerializer>> snapshot){
+
+          List<Widget> solicitacoesWidgets = [];
+
+          if(!snapshot.hasData || snapshot.data.length == 0){
+
+            return Center(
+              child: Text("Nenhuma solicitação encontrada", style: TextStyle(
+                fontSize: 18
+              )),
+            );
+
+          }
+          else{
+
+            for (SolicitacaoSerializer item in snapshot.data) {
+              solicitacoesWidgets.add(
+                SolicitacaoBox(
+                  item: item,
+                )
+              );
+            }
+
+          }
+
+          solicitacoesWidgets.add(
+            Padding(padding: EdgeInsets.only(top: 100),)
+          );
+
+          return ListView(
+            children: solicitacoesWidgets,
+          );
+
+        }
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     
@@ -104,47 +145,41 @@ class _MainHomePageState extends State<MainHomePage> {
           ),
         ],
       ),
-      body: FutureBuilder(
-        future: buscaSolicitacoes(),
-        builder: (BuildContext context, AsyncSnapshot<List<SolicitacaoSerializer>> snapshot){
-
-          List<Widget> solicitacoesWidgets = [];
-
-          if(snapshot.hasData){
-
-            for (SolicitacaoSerializer item in snapshot.data) {
-              solicitacoesWidgets.add(
-                SolicitacaoBox(
-                  item: item,
-                )
-              );
+      floatingActionButton: SpeedDial(
+        animatedIcon: AnimatedIcons.menu_close,
+        animatedIconTheme: IconThemeData(size: 22.0),
+        children: [
+          SpeedDialChild(
+            child: Icon(Icons.add),
+            onTap: () => {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => NovaSolicitacaoPage()))
             }
-
-          }
-
-          return ListView(
-            children: [
-              Padding(padding: EdgeInsets.only(top: 20),),
-              Container(
-                child: Center(
-                  child: MainMenu(defaultSelected: 1,),
-                ),
-              ),
-              Padding(padding: EdgeInsets.only(top: 20),),
-              Container(
-                margin: EdgeInsets.only(left: 20, right: 20),
-                child: Divider(
-                  color: Color(0xFF333333),
-                ),
-              ),
-              Padding(padding: EdgeInsets.only(top: 10),),
-
-              ...solicitacoesWidgets
-            ],
-          );
-
-        }
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.refresh),
+            onTap: () => {
+              setState(() {})
+            }
+          ),
+          // SpeedDialChild(
+          //   child: Icon(Icons.exit_to_app),
+          //   backgroundColor: Colors.red,
+          //   onTap: () async {
+          //     RestApi().logout();
+          //     Navigator.push(context, MaterialPageRoute(builder: (_) => IntermdiareScreen()));
+          //   }
+          // ),
+        ],
+      ),
+      body: Column(
+        children: <Widget>[
+          Padding(padding: EdgeInsets.only(top: 10),),
+          Expanded(
+            child: solicitacoes(),
+          ),
+        ],
       )
     );
   }
 }
+
