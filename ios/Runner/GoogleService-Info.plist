@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>929294025511-vht7otl8t0697c7ajmgedh6jiburieok.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.929294025511-vht7otl8t0697c7ajmgedh6jiburieok</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBCkZCUFfLZTMvDaG8Z-Whlc0l7fU1vFl4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>929294025511</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.igrejaemcontagem.inscricao-financas</string>
+	<key>PROJECT_ID</key>
+	<string>iec-conferencia</string>
+	<key>STORAGE_BUCKET</key>
+	<string>iec-conferencia.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:929294025511:ios:b3961d0450dd504ab29f02</string>
+	<key>DATABASE_URL</key>
+	<string>https://iec-conferencia.firebaseio.com</string>
+</dict>
+</plist>
