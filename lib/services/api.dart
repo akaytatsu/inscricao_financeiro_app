@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:iec_despesas_app/services/serializers/account_serializers.dart';
+import 'package:iec_despesas_app/services/serializers/comprovante_serializer.dart';
 import 'package:iec_despesas_app/services/serializers/conferencia_serializer.dart';
 import 'package:iec_despesas_app/services/serializers/create_account_error.dart';
 import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
@@ -10,7 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as path;
 
 class RestApi {
-  String urlBase = "http://inscricao.igrejaemcontagem.com.br/";
+  // String urlBase = "http://inscricao.igrejaemcontagem.com.br/";
+  String urlBase = "http://192.168.25.221:9000/";
 
   Future<Map<String, String>> _headers({Map<String, String> headers, logged = true}) async{
     if(headers == null){
@@ -54,6 +56,14 @@ class RestApi {
     headers = await _headers(headers: headers, logged: logged);
 
     return http.get(url, headers: headers);
+  }
+
+  Future<http.Response> _delete(String url, {Map<String, String> headers, bool logged = true}) async {
+    url = this.urlBase + url;
+
+    headers = await _headers(headers: headers, logged: logged);
+
+    return http.delete(url, headers: headers);
   }
 
   Map<String, dynamic> responseObject(status, {data, errors, error}){
@@ -224,7 +234,7 @@ class RestApi {
   }
 
   Future<Map<String, dynamic>> uploadComprovante(File image, int id) async {
-    final url = this.urlBase + 'api/financeiro/enviar_comprovante/';
+    final url = this.urlBase + 'api/comprovante/';
 
     String name = path.basename(image.path);
 
@@ -235,7 +245,7 @@ class RestApi {
     await image.readAsBytes(),
     filename: name));
 
-    request.fields['id'] = id.toString();
+    request.fields['despesa'] = id.toString();
     
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -380,6 +390,23 @@ class RestApi {
 
   }
 
+  Future<Map<String, dynamic>> confirmComprovation(int despesaId, {context}) async {
+    final url = 'api/financeiro/enviar_comprovante/';
+    final response = await this._put(url, params: {
+      "id": despesaId
+    });
+
+    if(response.statusCode == 200){
+      return this.responseObject(
+          response.statusCode);
+    }else{
+      return this.responseObject(
+          response.statusCode,
+          error: utf8.decode(response.bodyBytes) );
+    }
+
+  }
+
   Future<Map<String, dynamic>> reproveProof(int solicitationId, {context}) async {
     final url = 'api/financeiro/reprova_aprovacao_solicitacao/';
     final response = await this._put(url, params: {
@@ -398,5 +425,35 @@ class RestApi {
 
   }
 
+  Future<Map<String, dynamic>> getComprovantes(int despesaId) async {
+    final url = 'api/comprovante?id='+despesaId.toString();
+    final response = await this._get(url, logged: true, );
+ 
+    if(response.statusCode == 200){
+      return this.responseObject(
+        response.statusCode, 
+        data: ( json.decode(utf8.decode(response.bodyBytes)) as List).map((data) => ComprovanteSerializer.fromJson(data)).toList() );
+    }else{
+      return this.responseObject(
+        response.statusCode, 
+        error: utf8.decode(response.bodyBytes) );
+    }
+  }
+
+  Future<Map<String, dynamic>> deletaComprovante(int comprovanteId) async {
+    final url = 'api/comprovante/'+comprovanteId.toString() + '/';
+    print(url);
+    final response = await this._delete(url, logged: true, );
+ 
+    if(response.statusCode == 200){
+      return this.responseObject(
+        response.statusCode, 
+      );
+    }else{
+      return this.responseObject(
+        response.statusCode, 
+        error: utf8.decode(response.bodyBytes) );
+    }
+  }
 
 }

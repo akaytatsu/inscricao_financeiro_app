@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iec_despesas_app/pages/comprovante/comprovante.dart';
+import 'package:iec_despesas_app/pages/detalhes/components/comprovantes.dart';
 import 'package:iec_despesas_app/pages/home/home.dart';
 import 'package:iec_despesas_app/services/api.dart';
 import 'package:iec_despesas_app/services/serializers/account_serializers.dart';
@@ -24,6 +25,8 @@ class _DetalhePageState extends State<DetalhePage> {
   final int id;
   SolicitacaoSerializer item = new SolicitacaoSerializer();
 
+  Widget comprovanteTable = Container();
+
   final List<Widget> buttons = new List();
   AccountSerializer user = new AccountSerializer();
 
@@ -32,6 +35,12 @@ class _DetalhePageState extends State<DetalhePage> {
   RestApi _api = RestApi();
   
   _DetalhePageState({@required this.id});
+
+  @override
+  void initState() { 
+    super.initState();
+    
+  }
 
   getUserInfo() async{
     var response = await _api.me();
@@ -49,6 +58,7 @@ class _DetalhePageState extends State<DetalhePage> {
 
     if( response['status'] == 200 ){
       item = response['data'];
+
       return item;
     }
 
@@ -390,8 +400,9 @@ class _DetalhePageState extends State<DetalhePage> {
 
     await _api.uploadComprovante(image, item.id);
 
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => MainHomePage()));
+    setState(() {
+      
+    });
   }
 
   confirmTransferMoney() async{
@@ -424,6 +435,41 @@ class _DetalhePageState extends State<DetalhePage> {
 
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => MainHomePage()));
+  }
+
+  sendComprovation() async{
+
+    await showLoadingDialog();
+    
+    Map<String, dynamic> response = await _api.confirmComprovation(item.id);
+
+    hideLoadingDialog();
+
+    if (response['status'] != 200) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            // title: Text("ops..."),
+              content: Text(
+                "Você deve informar no minimo um comprovante.",
+                textAlign: TextAlign.center,
+              ),
+              actions: <Widget>[
+                // define os botões na base do dialogo
+                FlatButton(
+                  child: Text("close"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ]);
+        });
+    }else{
+      Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MainHomePage()));
+    }
+    
   }
 
   reproveProof() async{
@@ -474,6 +520,17 @@ class _DetalhePageState extends State<DetalhePage> {
     );
   }
 
+  Widget comprovacao(){
+
+    return Column(
+      children: <Widget>[
+        comprovanteTable,
+        btn("Adicionar Comprovante", Icons.add_a_photo, selecionaComprovantes),
+        btn("Enviar Comprovação", Icons.done, sendComprovation),
+      ],
+    );
+  }
+
   List<Widget> buildChildren() {
 
     String repasseLabel = "Confirmar Repasse Recurso";
@@ -496,7 +553,8 @@ class _DetalhePageState extends State<DetalhePage> {
 
       (item.status == 2 && (user.canPay || user.id == item.solicitante.id)) ? btn(repasseLabel, Icons.monetization_on, confirmTransferMoney) : Container(),
 
-      (item.status == 3 || item.status == 4) ? btn("Selecionar Comprovante", Icons.add_a_photo, selecionaComprovantes) : Container(),
+      (item.status == 3 || item.status == 4) ? ComprovantesTable(despesaId: widget.id,) : Container(),
+      (item.status == 3 || item.status == 4) ? comprovacao() : Container(),
 
       (item.status == 5 && user.canAprove) ? btn("Confirmar Comprovação", Icons.check_circle, confirmProof) : Container(),
       (item.status == 5 && user.canAprove) ? btn("Recusar Comprovação", Icons.reply, reproveProof) : Container(),
