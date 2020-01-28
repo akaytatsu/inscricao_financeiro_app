@@ -14,8 +14,7 @@ class SolicitacaoSerializer {
     int usuarioSolicitacao;
     dynamic usuarioAprovacao;
     dynamic usuarioComprovacao;
-    dynamic categoria;
-    String comprovante;
+    String categoria;
 
     SolicitacaoSerializer({
         this.id,
@@ -32,7 +31,6 @@ class SolicitacaoSerializer {
         this.usuarioAprovacao,
         this.usuarioComprovacao,
         this.categoria,
-        this.comprovante,
     });
 
     factory SolicitacaoSerializer.fromJson(Map<String, dynamic> json) => SolicitacaoSerializer(
@@ -47,7 +45,6 @@ class SolicitacaoSerializer {
         dataSolicitacao: json["data_solicitacao"] == null ? null : DateTime.parse(json["data_solicitacao"]),
         conferencia: json["conferencia"] == null ? null : json["conferencia"],
         usuarioSolicitacao: json["usuario_solicitacao"] == null ? null : json["usuario_solicitacao"],
-        comprovante: json["comprovante"] == null ? null : json["comprovante"],
         usuarioAprovacao: json["usuario_aprovacao"],
         usuarioComprovacao: json["usuario_comprovacao"],
         categoria: json["categoria"],
@@ -68,7 +65,6 @@ class SolicitacaoSerializer {
         "usuario_aprovacao": usuarioAprovacao,
         "usuario_comprovacao": usuarioComprovacao,
         "categoria": categoria,
-        "comprovante": comprovante,
     };
 
   String statusTitulo() {

@@ -275,7 +275,6 @@ class _DetalhePageState extends State<DetalhePage> {
             item.categoria == null || item.categoria == "" ? Container() : detalheELabel("Categoria", item.categoria),
             detalheELabel("Justificativa", item.justificativa),
             item.justificativaReprovacao == null || item.justificativaReprovacao == "" ? Container() : detalheELabel("Justificativa Reprovação", item.justificativaReprovacao),
-            item.comprovante == null || item.comprovante == "" ? Container() : linkComprovante(item.comprovante),
             Padding(
               padding: EdgeInsets.only(bottom: 25),
             )
