@@ -89,7 +89,7 @@ class _NovaSolicitacaoPageState extends State<NovaSolicitacaoPage> {
       await buscaConferencias();
 
       double value = NumberFormat(("###,##")).parse( _fbKey.currentState.value['value'] ).toDouble() / 100;
-      String justify = _fbKey.currentState.value['value'];
+      String justify = _fbKey.currentState.value['justify'];
 
       Map<String, dynamic> response =
       await _api.newSolicitation(justify, value, _currentConferencia.id, context: context);
