@@ -3,12 +3,14 @@ import 'package:iec_despesas_app/pages/comprovante/comprovante.dart';
 import 'package:iec_despesas_app/services/api.dart';
 import 'package:iec_despesas_app/services/serializers/comprovante_serializer.dart';
 import 'package:load/load.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
 class ComprovantesTable extends StatefulWidget {
 
   final int despesaId;
+  final bool canDelete;
 
-  ComprovantesTable({Key key, @required this.despesaId}) : super(key: key);
+  ComprovantesTable({Key key, @required this.despesaId, this.canDelete = true}) : super(key: key);
 
   @override
   _ComprovantesTableState createState() => _ComprovantesTableState();
@@ -97,7 +99,23 @@ class _ComprovantesTableState extends State<ComprovantesTable> {
 
           lista.add(title());
 
-          if(snapshot.data == null || snapshot.data.length == 0 || ! snapshot.hasData){
+          if(snapshot.connectionState == ConnectionState.waiting){
+            lista.add(
+              comprovanteCard(
+                child: Center(
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    child: LoadingIndicator(
+                      indicatorType: Indicator.circleStrokeSpin,
+                    ),
+                  ),
+                )
+              )
+            );
+          }
+
+          else if(snapshot.data.length == 0){
             lista.add(
               comprovanteCard(
                 child: Center(
@@ -108,6 +126,22 @@ class _ComprovantesTableState extends State<ComprovantesTable> {
           }
           else{
             for (var item in snapshot.data) {
+
+              Widget deleteOption;
+
+              if(widget.canDelete == true){
+                deleteOption = GestureDetector(
+                  onTap: (){
+                    deletaComprovante(item.id);
+                  },
+                  child: Icon(
+                    Icons.close
+                  ),
+                );
+              }else{
+                deleteOption = Container();
+              }
+
               lista.add(
                 comprovanteCard(
                   child: Row(
@@ -123,14 +157,7 @@ class _ComprovantesTableState extends State<ComprovantesTable> {
                               fontSize: 16,
                               fontWeight: FontWeight.bold)),
                       ),
-                      GestureDetector(
-                        onTap: (){
-                          deletaComprovante(item.id);
-                        },
-                        child: Icon(
-                          Icons.close
-                        ),
-                      )
+                      deleteOption,
                     ],
                   )
                 )

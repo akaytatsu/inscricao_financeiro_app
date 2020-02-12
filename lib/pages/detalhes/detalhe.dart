@@ -538,6 +538,8 @@ class _DetalhePageState extends State<DetalhePage> {
 
     String repasseLabel = "Confirmar Repasse Recurso";
 
+    bool canDeleteComprover = ((item.status == 3 || item.status == 4) && user.id == item.solicitante.id) ? true : false;
+
     if(user.id == item.solicitante.id){
       repasseLabel = 'Confirmar Recebimento Recurso';
     }
@@ -556,12 +558,13 @@ class _DetalhePageState extends State<DetalhePage> {
 
       (item.status == 2 && (user.canPay || user.id == item.solicitante.id)) ? btn(repasseLabel, Icons.monetization_on, confirmTransferMoney) : Container(),
 
-      (item.status == 3 || item.status == 4) ? ComprovantesTable(despesaId: widget.id,) : Container(),
+      (item.status == 3 || item.status == 4 || item.status == 5) ? ComprovantesTable(despesaId: widget.id, canDelete: canDeleteComprover,) : Container(),
       (item.status == 3 || item.status == 4) && (user.id == item.solicitante.id) ? comprovacao() : Container(),
 
       (item.status == 5 && user.canAprove) ? btn("Confirmar Comprovação", Icons.check_circle, confirmProof) : Container(),
       (item.status == 5 && user.canAprove) ? btn("Recusar Comprovação", Icons.reply, reproveProof) : Container(),
       
+      Container(height: 30,),
     ];
 
     return builder;
