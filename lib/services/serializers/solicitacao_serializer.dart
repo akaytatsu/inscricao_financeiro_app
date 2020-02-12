@@ -200,4 +200,12 @@ class Solicitante {
         "can_pay": canPay == null ? null : canPay,
         "tp_user_financeiro": tpUserFinanceiro == null ? null : tpUserFinanceiro,
     };
+
+    String maxName(){
+      if(this.name.length > 20){
+        return this.name.substring(0, 20);
+      }
+
+      return this.name;
+    }
 }

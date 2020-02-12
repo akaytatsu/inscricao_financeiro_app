@@ -94,7 +94,7 @@ class SolicitacaoBox extends StatelessWidget {
   Widget memberDetails(){
 
     var solicitanteNome = Text(
-      item.solicitante.name,
+      item.solicitante.maxName(),
       style: TextStyle(
         fontSize: 18
       )
@@ -191,47 +191,5 @@ class SolicitacaoBox extends StatelessWidget {
       ),
     );
 
-    // return GestureDetector(
-    //   onTap: () {
-    //     Navigator.push(context, MaterialPageRoute(builder: (_) => DetalhePage(id: item.id)));
-    //   },
-    //   child: Container(
-    //     margin: EdgeInsets.only(left: 0, right: 0, top: 10, bottom: 10),
-    //     height: 110,
-    //     decoration: BoxDecoration(
-    //         gradient: gradientBackground(),
-    //         borderRadius: BorderRadiusDirectional.circular(20),
-    //         boxShadow: [
-    //           BoxShadow(
-    //             color: Colors.black.withOpacity(0.4),
-    //             blurRadius: 3,
-    //             offset: Offset(3, 3),
-    //           )
-    //         ]),
-    //     child: Column(
-    //       crossAxisAlignment: CrossAxisAlignment.start,
-    //       children: <Widget>[
-    //         Padding(
-    //           padding: EdgeInsets.only(left: 50, top: 15),
-    //           child: nomeSolicitanteWidget(),
-    //         ),
-    //         Padding(
-    //           padding: EdgeInsets.only(left: 70, top: 5),
-    //           child: statusSolicitacaoWidget(),
-    //         ),
-    //         Padding(
-    //             padding: EdgeInsets.only(left: 30, top: 15, right: 20),
-    //             child: Row(
-    //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //               children: <Widget>[
-    //                 idSolicitacaoWidget(),
-    //                 dataSolicitacaoWidget(),
-    //                 valorSolicitacaoWidget()
-    //               ],
-    //             )),
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 }

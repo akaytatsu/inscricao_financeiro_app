@@ -6,6 +6,7 @@ import 'package:iec_despesas_app/pages/detalhes/detalhe.dart';
 import 'package:iec_despesas_app/pages/nova_solicitacao/nova_solicitacao.dart';
 import 'package:iec_despesas_app/services/api.dart';
 import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class MainHomePage extends StatefulWidget {
@@ -91,7 +92,18 @@ class _MainHomePageState extends State<MainHomePage> {
 
           List<Widget> solicitacoesWidgets = [];
 
-          if(!snapshot.hasData || snapshot.data.length == 0){
+          if(snapshot.connectionState == ConnectionState.waiting){
+            return Center(
+              child: Container(
+                width: 50,
+                height: 50,
+                child: LoadingIndicator(
+                  indicatorType: Indicator.circleStrokeSpin,
+                ),
+              ),
+            );
+          }
+          else if(!snapshot.hasData || snapshot.data.length == 0){
 
             return Center(
               child: Text("Nenhuma solicitação encontrada", style: TextStyle(
