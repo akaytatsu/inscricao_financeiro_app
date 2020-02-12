@@ -397,7 +397,11 @@ class _DetalhePageState extends State<DetalhePage> {
 
     var image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
+    showLoadingDialog();
+
     await _api.uploadComprovante(image, item.id);
+
+    hideLoadingDialog();
 
     setState(() {
       

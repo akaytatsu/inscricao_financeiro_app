@@ -3,24 +3,30 @@ import 'package:iec_despesas_app/pages/detalhes/detalhe.dart';
 import 'package:iec_despesas_app/services/serializers/solicitacao_serializer.dart';
 import 'package:intl/intl.dart';
 
-class SolicitacaoBox extends StatelessWidget {
+
+
+class SolicitacaoBox extends StatefulWidget {
   final SolicitacaoSerializer item;
+  
+  SolicitacaoBox({Key key, @required this.item}) : super(key: key);
+
+  @override
+  _SolicitacaoBoxState createState() => _SolicitacaoBoxState();
+}
+
+class _SolicitacaoBoxState extends State<SolicitacaoBox> {
   AnimationController controller;
   Animation<double> animation;
 
-  SolicitacaoBox(
-      {Key key, @required this.item})
-      : super(key: key);
-
   gradientBackground() {
-    return LinearGradient(colors: item.listColors());
+    return LinearGradient(colors: widget.item.listColors());
   }
 
   Widget nomeSolicitanteWidget() {
     var textStyle = TextStyle(color: Colors.white, fontSize: 20);
 
     return Text(
-      item.solicitante.name,
+      widget.item.solicitante.name,
       style: textStyle,
     );
   }
@@ -29,7 +35,7 @@ class SolicitacaoBox extends StatelessWidget {
     var textStyle = TextStyle(color: Colors.white, fontSize: 20);
 
     return Text(
-      DateFormat("dd/MM/yyyy", "en_US").format(item.dataSolicitacao),
+      DateFormat("dd/MM/yyyy", "en_US").format(widget.item.dataSolicitacao),
       style: textStyle,
     );
   }
@@ -38,7 +44,7 @@ class SolicitacaoBox extends StatelessWidget {
     var textStyle = TextStyle(color: Colors.white, fontSize: 20);
 
     return Text(
-      "ID: " + item.id.toString(),
+      "ID: " + widget.item.id.toString(),
       style: textStyle,
     );
   }
@@ -62,7 +68,7 @@ class SolicitacaoBox extends StatelessWidget {
           padding: EdgeInsets.only(right: 5),
         ),
         Text(
-          f.format(item.valor),
+          f.format(widget.item.valor),
           style: valueTextStyle,
         ),
       ],
@@ -70,7 +76,7 @@ class SolicitacaoBox extends StatelessWidget {
   }
 
   Widget statusSolicitacaoWidget() {
-    String statusStr = "Situação: " + item.statusTitulo();
+    String statusStr = "Situação: " + widget.item.statusTitulo();
 
     var textStyle = TextStyle(color: Color(0xFFCECBCB), fontSize: 15);
 
@@ -83,7 +89,7 @@ class SolicitacaoBox extends StatelessWidget {
   Widget statusRound(){
     return Container(
       decoration: BoxDecoration(
-        color: item.statusColor(),
+        color: widget.item.statusColor(),
         borderRadius: BorderRadius.all(Radius.circular(100))
       ),
       width: 15,
@@ -94,21 +100,21 @@ class SolicitacaoBox extends StatelessWidget {
   Widget memberDetails(){
 
     var solicitanteNome = Text(
-      item.solicitante.maxName(),
+      widget.item.solicitante.maxName(),
       style: TextStyle(
         fontSize: 18
       )
     );
 
     var status = Text(
-      item.statusTitulo(),
+      widget.item.statusTitulo(),
       style: TextStyle(
         fontSize: 14
       )
     );
 
     var descricao = Text(
-      item.justificativa.length > 27 ? item.justificativa.substring(0, 27) + "..." : item.justificativa,
+      widget.item.justificativa.length > 27 ? widget.item.justificativa.substring(0, 27) + "..." : widget.item.justificativa,
       style: TextStyle(
         fontSize: 16
       )
@@ -129,7 +135,7 @@ class SolicitacaoBox extends StatelessWidget {
     Intl.defaultLocale = 'pt_BR';
     var f = new NumberFormat("#,###.00");
 
-    String valor = "R\$: " + f.format(item.valor);
+    String valor = "R\$: " + f.format(widget.item.valor);
 
     var valueDetail = Text(
       valor,
@@ -139,7 +145,7 @@ class SolicitacaoBox extends StatelessWidget {
     );
 
     var date = Text(
-      DateFormat("dd/MM/yyyy", "en_US").format(item.dataSolicitacao.toLocal()),
+      DateFormat("dd/MM/yyyy", "en_US").format(widget.item.dataSolicitacao.toLocal()),
       style: TextStyle(
         fontSize: 13
       )
@@ -170,7 +176,7 @@ class SolicitacaoBox extends StatelessWidget {
 
     return GestureDetector(
       onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (_) => DetalhePage(id: item.id)));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => DetalhePage(id: widget.item.id)));
       },
       child: Container(
         padding: EdgeInsets.only(right: 10, left: 10, bottom: 10, top: 10),
