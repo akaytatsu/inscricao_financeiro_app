@@ -125,7 +125,7 @@ class _ComprovantesTableState extends State<ComprovantesTable> {
             );
           }
           else{
-            for (var item in snapshot.data) {
+            for (ComprovanteSerializer item in snapshot.data) {
 
               Widget deleteOption;
 
@@ -149,11 +149,13 @@ class _ComprovantesTableState extends State<ComprovantesTable> {
                     children: <Widget>[
                       GestureDetector(
                         onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (_) => ComprovantePage(comprovante: item.comprovante,)));
+                          if ( item.isImage ){
+                            Navigator.push(context, MaterialPageRoute(builder: (_) => ComprovantePage(comprovante: item.comprovante,)));
+                          }
                         },
                         child: Text("Ver Comprovante",
                           style: TextStyle(
-                              color: Colors.blue,
+                              color: item.isImage == true ? Colors.blue : Colors.black ,
                               fontSize: 16,
                               fontWeight: FontWeight.bold)),
                       ),

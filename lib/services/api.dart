@@ -232,6 +232,8 @@ class RestApi {
     }
   }
 
+  
+
   Future<Map<String, dynamic>> uploadComprovante(File image, int id) async {
     final url = this.urlBase + 'api/comprovante/';
 

@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:iec_despesas_app/pages/comprovante/comprovante.dart';
 import 'package:iec_despesas_app/pages/detalhes/components/comprovantes.dart';
@@ -9,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:load/load.dart';
 import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
+import 'package:path/path.dart' as path;
 
 class DetalhePage extends StatefulWidget {
   final int id;
@@ -72,7 +76,8 @@ class _DetalhePageState extends State<DetalhePage> {
     } else if (item.status == 2 && user.canPay) {
       buttons.add(btn("Confirmar Repasse Recurso", Icons.monetization_on, confirmTransferMoney));
     } else if (item.status == 3 || item.status == 4) {
-      buttons.add(btn("Selecionar Comprovante", Icons.add_a_photo, selecionaComprovantes));
+      buttons.add(btn("Seleciona Comprovante Imagem", Icons.add_a_photo, selecionaComprovanteImage));
+      buttons.add(btn("Selecionar Comprovante PDF", Icons.add_a_photo, selecionaComprovantePDF));
       // buttons.add(btn("Enviar Comprovante", Icons.file_upload, errorRequestDialog));
     } else if (item.status == 5 && user.canAprove) {
       buttons.add(btn("Confirmar Comprovação", Icons.check_circle, confirmProof));
@@ -393,19 +398,90 @@ class _DetalhePageState extends State<DetalhePage> {
         context, MaterialPageRoute(builder: (context) => MainHomePage()));
   }
 
-  selecionaComprovantes() async{
+  selecionaComprovanteImage() async{
 
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    File comprovante = await ImagePicker.pickImage(source: ImageSource.gallery);
+    String ext = "";
 
-    showLoadingDialog();
+    try{
+      ext = path.basename(comprovante.path).split(".").last;
+    }catch(Exception){
+    }
 
-    await _api.uploadComprovante(image, item.id);
+    if(!["jpg", "jpeg", "png"].contains(ext)){
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+              // title: Text("ops..."),
+              content: Text(
+                "Você deve selecionar uma imagem",
+                textAlign: TextAlign.center,
+              ),
+              actions: <Widget>[
+                // define os botões na base do dialogo
+                FlatButton(
+                  child: Text("fechar"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ]);
+        });
+    }else{
+      showLoadingDialog();
 
-    hideLoadingDialog();
+      await _api.uploadComprovante(comprovante, item.id);
 
-    setState(() {
-      
-    });
+      hideLoadingDialog();
+
+      setState(() {
+        
+      });
+    }
+  }
+
+  selecionaComprovantePDF() async{
+
+    File comprovante = await FilePicker.getFile();
+    String ext;
+
+    try{
+      ext = path.basename(comprovante.path).split(".").last;
+    }catch(Exception){
+    }
+
+    if(!["pdf"].contains(ext)){
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+              // title: Text("ops..."),
+              content: Text(
+                "Você deve selecionar um PDF",
+                textAlign: TextAlign.center,
+              ),
+              actions: <Widget>[
+                // define os botões na base do dialogo
+                FlatButton(
+                  child: Text("fechar"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ]);
+        });
+    }else{
+      showLoadingDialog();
+
+      await _api.uploadComprovante(comprovante, item.id);
+
+      hideLoadingDialog();
+
+      setState(() {
+        
+      });
+    }
   }
 
   confirmTransferMoney() async{
@@ -528,7 +604,8 @@ class _DetalhePageState extends State<DetalhePage> {
     return Column(
       children: <Widget>[
         comprovanteTable,
-        btn("Adicionar Comprovante", Icons.add_a_photo, selecionaComprovantes),
+        btn("Adicionar Comprovante Imagem", Icons.add_a_photo, selecionaComprovanteImage),
+        btn("Adicionar Comprovante PDF ", Icons.add_a_photo, selecionaComprovantePDF),
         btn("Enviar Comprovação", Icons.done, sendComprovation),
       ],
     );
