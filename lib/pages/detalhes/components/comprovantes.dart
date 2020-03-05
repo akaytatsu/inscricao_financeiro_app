@@ -4,6 +4,7 @@ import 'package:iec_despesas_app/services/api.dart';
 import 'package:iec_despesas_app/services/serializers/comprovante_serializer.dart';
 import 'package:load/load.dart';
 import 'package:loading_indicator/loading_indicator.dart';
+import 'package:url_launcher/url_launcher.dart' as UrlLauncher;
 
 class ComprovantesTable extends StatefulWidget {
 
@@ -151,11 +152,13 @@ class _ComprovantesTableState extends State<ComprovantesTable> {
                         onTap: (){
                           if ( item.isImage ){
                             Navigator.push(context, MaterialPageRoute(builder: (_) => ComprovantePage(comprovante: item.comprovante,)));
+                          }else{
+                            UrlLauncher.launch(item.comprovante);
                           }
                         },
-                        child: Text("Ver Comprovante",
+                        child: Text( item.isImage == true ? "Ver Comprovante (Imagem)" : "Ver Comprovante (PDF)",
                           style: TextStyle(
-                              color: item.isImage == true ? Colors.blue : Colors.black ,
+                              color: Colors.blue,
                               fontSize: 16,
                               fontWeight: FontWeight.bold)),
                       ),
